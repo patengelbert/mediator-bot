@@ -14,6 +14,7 @@ Notes
  - http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.43.139
  - http://www.grc.nasa.gov/WWW/Acoustics/testing/instrumentation/arraymic.htm
  - https://code.google.com/archive/p/voiceid/
+ 
 Hardware
  - https://www.amazon.co.uk/Logitech-C920-Pro-1080p-Webcam/dp/B006A2Q81M/ref=pd_lpo_147_bs_t_2/252-4253252-4860219?ie=UTF8&psc=1&refRID=32PJ73JZMFMDC2M2SY65
  - http://www.music-group.com/Categories/Behringer/Microphones/Condenser-Microphones/C-1/p/P0226
