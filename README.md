@@ -1,5 +1,16 @@
 # mediator-bot
 
+The main function of the mediator-bot is to act as a mediator for a conversation/debate/meeting, trying to balance the conversation so that each participant is given the chance to speak.
+
+Using:
+* Speech Recognition - voice recognition, determining if multiple people are talking and split into separate channels, produce transcript, determine volume level and tone of conversation
+* Face Recognition - match face with name and speech, additional detection of speaking
+* Processing - determine the balance of the discussion, decide what actions by the robot are required, display visual representation of conversation statistics
+* Robot - gestures and speech to direct conversation, interaction (e.g. turn head towards speaker)
+
+Possible test - hold two separate meetings, one with a human mediator and one with the mediator-bot, gather participants' opinions on which was preferred.
+
+
 ## Resources
 
 Notes
