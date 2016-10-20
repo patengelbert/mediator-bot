@@ -26,6 +26,7 @@ Notes
  - http://www.grc.nasa.gov/WWW/Acoustics/testing/instrumentation/arraymic.htm
  - https://code.google.com/archive/p/voiceid/
  - https://www.google.co.uk/url?sa=t&source=web&rct=j&url=http://www1.icsi.berkeley.edu/~fractor/papers/friedland_64.pdf&ved=0ahUKEwix0MfmjerPAhWMLMAKHUuACuQQFggbMAA&usg=AFQjCNGZtE8DhNTQvzM_Gp3joqhW_CZ4JQ&sig2=evHgr21qxQMfv6m1FdkxUQ Research paper on real time speech diarization 
+ - http://multimedia.icsi.berkeley.edu/speaker-diarization/fast-speaker-diarization-using-python/ Implementation of real time speech diarization using a GPU and python 
  
 Hardware
  - https://www.amazon.co.uk/Logitech-C920-Pro-1080p-Webcam/dp/B006A2Q81M/ref=pd_lpo_147_bs_t_2/252-4253252-4860219?ie=UTF8&psc=1&refRID=32PJ73JZMFMDC2M2SY65
