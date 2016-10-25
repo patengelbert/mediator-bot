@@ -26,7 +26,7 @@ Possible test - hold two separate meetings, one with a human mediator and one wi
 ##Timeline
 
 | Date          | Deadline          | Deliverables    |
-| ------------- |:-----------------:| --------------:|
+| ------------- |:-----------------| :--------------|
 | 3/11/16       | 4 page Design Report     | - [ ] Research Hypothesis with stats<br>  - [x] System Design Diagram<br>  - [ ] your proposed experimental validation methodology     |
 | 17/11/16    | 4 page Individual Component Paper         |  - [ ]     Report the state of the subcomponent you are responsible for <br> - [ ] Design to be followed for the subcomponent      |
 | 15/12/16 | Final Presentation, Live demo          |   - [ ] It Works         |
