@@ -58,3 +58,6 @@ Hardware
  - http://www.ebay.co.uk/sch/Omni-directional-Camera-Microphone/83857/bn_70250/i.html
  - http://www.edmundoptics.com/cameras/
 
+ - https://www.amazon.co.uk/PChero-Omnidirectional-Condenser-Microphone-Interviews/dp/B01GKSXTJE/ref=sr_1_sc_3?ie=UTF8&qid=1477403717&sr=8-3-spell&keywords=clip+on+usb+microphojne
+ - https://www.amazon.co.uk/Tonor-Professional-Condenser-Microphone-Computer/dp/B01142EPO4/ref=sr_1_3?ie=UTF8&qid=1477404705&sr=8-3&keywords=usb+microphone
+
