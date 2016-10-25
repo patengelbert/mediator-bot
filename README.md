@@ -19,6 +19,10 @@ Possible test - hold two separate meetings, one with a human mediator and one wi
 - Library of spoken phrases to use in response to specific situations, plus a wrapper class
 - UI for tablet/laptop (who is speaking, speech balance, who is sittning where)
 
+## System
+
+<img align="middle" src="https://raw.github.com/patengelbert/mediator-bot/blob/master/images/system-diagram.png" />
+
 ## Resources
 
 Notes
