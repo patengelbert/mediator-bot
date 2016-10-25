@@ -10,6 +10,14 @@ Using:
 
 Possible test - hold two separate meetings, one with a human mediator and one with the mediator-bot, gather participants' opinions on which was preferred.
 
+## Tasks
+- Cocktail party problem, preprocessing for speech recognition (Split sound into sp=eperate streams for the number of current speakers)
+- Speech recognition, transcribing the conversation (Who is speaking, what are the words that they are saying)
+- Natural Languague processing, interpretting the text derived from the speech recognition (speaker, person spoken to, emotion, etc.)
+- AI framework from current mood to appropriate response (link input to correct response)
+- Library of actions for nao eg. pointing, waving, signalling to listen
+- Library of spoken phrases to use in response to specific situations, plus a wrapper class
+- 
 
 ## Resources
 
@@ -27,6 +35,7 @@ Notes
  - https://code.google.com/archive/p/voiceid/
  - https://www.google.co.uk/url?sa=t&source=web&rct=j&url=http://www1.icsi.berkeley.edu/~fractor/papers/friedland_64.pdf&ved=0ahUKEwix0MfmjerPAhWMLMAKHUuACuQQFggbMAA&usg=AFQjCNGZtE8DhNTQvzM_Gp3joqhW_CZ4JQ&sig2=evHgr21qxQMfv6m1FdkxUQ Research paper on real time speech diarization 
  - http://multimedia.icsi.berkeley.edu/speaker-diarization/fast-speaker-diarization-using-python/ Implementation of real time speech diarization using a GPU and python 
+ - http://stackoverflow.com/questions/20414667/cocktail-party-algorithm-svd-implementation-in-one-line-of-code
  
 Hardware
  - https://www.amazon.co.uk/Logitech-C920-Pro-1080p-Webcam/dp/B006A2Q81M/ref=pd_lpo_147_bs_t_2/252-4253252-4860219?ie=UTF8&psc=1&refRID=32PJ73JZMFMDC2M2SY65
