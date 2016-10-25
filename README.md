@@ -21,7 +21,7 @@ Possible test - hold two separate meetings, one with a human mediator and one wi
 
 ## System
 
-![Alt text](https://github.com/patengelbert/mediator-bot/raw/master/images/system-diagram.png?raw=true)
+![Alt text](https://github.com/patengelbert/mediator-bot/raw/master/images/System Overview.png?raw=true)
 
 ## Resources
 
