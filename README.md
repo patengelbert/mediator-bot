@@ -17,7 +17,7 @@ Possible test - hold two separate meetings, one with a human mediator and one wi
 - AI framework from current mood to appropriate response (link input to correct response)
 - Library of actions for nao eg. pointing, waving, signalling to listen
 - Library of spoken phrases to use in response to specific situations, plus a wrapper class
-- 
+- UI for tablet/laptop (who is speaking, speech balance, who is sittning where)
 
 ## Resources
 
