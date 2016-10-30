@@ -1,6 +1,6 @@
 #!/bin/bash
 
-.PHONY: docs release clean build
+.PHONY: docs release clean build test
 
 clean:
 	rm -rf env htmlcov build .tox .eggs
@@ -11,11 +11,11 @@ build:
 	pip install -U -r requirements.txt
 
 test: clean build
-		. env/bin/activate && \
-		py.test mediator_bot/test && \
-		py.test --cov=mediator_bot mediator_bot/test && \
-		coverage html && \
-		coverage report
+	. env/bin/activate && \
+	py.test mediator_bot/test && \
+	py.test --cov=mediator_bot mediator_bot/test && \
+	coverage html && \
+	coverage report
 
 docs:
 	sphinx-build -aE docs build/docs > /dev/null

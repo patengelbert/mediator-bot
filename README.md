@@ -1,4 +1,4 @@
-# mediator-bot
+# Mediator-Bot
 
 [![Build Status](https://travis-ci.com/patengelbert/mediator-bot.svg?token=imo3fxmH6VGoPsvCNfup&branch=master)](https://travis-ci.com/patengelbert/mediator-bot)
 
@@ -12,14 +12,28 @@ Using:
 
 Possible test - hold two separate meetings, one with a human mediator and one with the mediator-bot, gather participants' opinions on which was preferred.
 
+## Requirements
+- Python 2.7 (Project should be compatible with both it and Python 3.4)
+- Make
+- Python 2.7 virtualenv ```pip install virtualenv```
+- Python 2.7 Sphinx ```pip install sphinx```
+
+## Installation
+- Run ```make build```
+- Enable the virtual environment ```. env/bin/activate```
+
+## Notes
+- Add any additional python packages that are required to the requirements.txt
+- Add unit tests for all new code to mediator_bot/test
+
 ## Tasks
-- Cocktail party problem, preprocessing for speech recognition (Split sound into sp=eperate streams for the number of current speakers)
+- Cocktail party problem, preprocessing for speech recognition (Split sound into separate streams for the number of current speakers)
 - Speech recognition, transcribing the conversation (Who is speaking, what are the words that they are saying)
-- Natural Languague processing, interpretting the text derived from the speech recognition (speaker, person spoken to, emotion, etc.)
+- Natural Language processing, interpreting the text derived from the speech recognition (speaker, person spoken to, emotion, etc.)
 - AI framework from current mood to appropriate response (link input to correct response)
 - Library of actions for nao eg. pointing, waving, signalling to listen
 - Library of spoken phrases to use in response to specific situations, plus a wrapper class
-- UI for tablet/laptop (who is speaking, speech balance, who is sittning where)
+- UI for tablet/laptop (who is speaking, speech balance, who is sitting where)
 
 ## System
 
