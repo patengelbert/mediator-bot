@@ -25,6 +25,23 @@ Possible test - hold two separate meetings, one with a human mediator and one wi
 ## Notes
 - Add any additional python packages that are required to the requirements.txt
 - Add unit tests for all new code to mediator_bot/test
+- I (Patrick) will get an email every timer a commit is made to master. I will also know who and what broke it and will chase you up on it.
+- Test everything before pushing
+- Develop on a local dev branch 
+``` [bash]
+git branch dev master
+git checkout dev
+git branch --set-upstream-to=master
+```
+- Update your dev branch by rebasing from master
+``` [bash]
+git stash
+git checkout master
+git pull
+git checkout dev
+git rebase
+git stash pop
+```
 
 ## Tasks
 - Cocktail party problem, preprocessing for speech recognition (Split sound into separate streams for the number of current speakers)
