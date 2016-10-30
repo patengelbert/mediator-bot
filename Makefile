@@ -1,6 +1,6 @@
 #!/bin/bash
 
-.PHONY: docs release clean build test
+.PHONY: docs release clean build test run
 
 clean:
 	rm -rf env htmlcov build .tox .eggs
@@ -24,3 +24,7 @@ release: test docs
 	xdg-open mediator_bot/version.py
 	xdg-open build/docs/index.html > /dev/null 2>&1 &
 	xdg-open htmlcov/index.html > /dev/null 2>&1 &
+
+run:
+	. env/bin/activate && \
+	python mediator_bot/bot.py -c mediator_bot/config/local.conf --debug

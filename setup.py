@@ -1,13 +1,6 @@
-from __future__ import print_function
-
 import io
-import os
-
 from setuptools import setup, find_packages
-
 import mediator_bot
-
-path = os.path.abspath(os.path.dirname(__file__))
 
 
 def read(*filenames, **kwargs):
@@ -35,7 +28,7 @@ setup(
     description='Mediator Robot for meeting rooms',
     long_description=long_description,
     packages=find_packages(),
-    include_package_data=True,
+    include_package_data=False,
     platforms='any',
     test_suite='mediator_bot.test.test_mediator_bot',
     classifiers=[
