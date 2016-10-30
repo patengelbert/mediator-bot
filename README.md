@@ -1,5 +1,7 @@
 # mediator-bot
 
+[![Build Status](https://travis-ci.org/patengelbert/mediator-bot.png?branch=master)](https://travis-ci.org/patengelbert/mediator-bot)
+
 The main function of the mediator-bot is to act as a mediator for a conversation/debate/meeting, trying to balance the conversation so that each participant is given the chance to speak.
 
 Using:
