@@ -52,6 +52,10 @@ git stash pop
 - Library of spoken phrases to use in response to specific situations, plus a wrapper class
 - UI for tablet/laptop (who is speaking, speech balance, who is sitting where)
 
+## Reports
+
+![Design Report](https://www.overleaf.com/6835404kgznhmrnwdwq)
+
 ## System
 
 ![Alt text](https://github.com/patengelbert/mediator-bot/raw/master/images/System Overview.png?raw=true)
