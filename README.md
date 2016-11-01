@@ -58,7 +58,7 @@ git stash pop
 
 ## System
 
-![Alt text](https://github.com/patengelbert/mediator-bot/raw/master/images/System Overview.png?raw=true)
+![System Overview](https://github.com/patengelbert/mediator-bot/raw/master/images/System Overview.png?raw=true)
 
 ##Timeline
 
@@ -68,7 +68,11 @@ git stash pop
 | 17/11/16    | 4 page Individual Component Paper         |  - [ ]     Report the state of the subcomponent you are responsible for <br> - [ ] Design to be followed for the subcomponent      |
 | 15/12/16 | Final Presentation, Live demo          |   - [ ] It Works         |
 | 22/12/16 | 8 page Final Report Submission (LaTex)         |   - [ ] Final System Design<br> - [ ] Experimental results  analysis <br> - [ ] Compressed file with all experimental results & readme.md <br> - [ ] Bonus 5% video-Explain hypothesis, experimental findings, potential use cases <br>*Look at examples on BB*       |
+## Similar Projects
 
+ - ![MIT Mediator Software](http://hd.media.mit.edu/tech-reports/TR-616.pdf)
+ - ![Ubiquitous Meeting Facilitator with Playful Real-Time User Interface](http://link.springer.com/chapter/10.1007%2F978-3-642-23641-9_3)
+ 
 ## Resources
 
 Notes
