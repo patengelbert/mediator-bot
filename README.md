@@ -54,7 +54,7 @@ git stash pop
 
 ## Reports
 
-![Design Report](https://www.overleaf.com/6835404kgznhmrnwdwq)
+[Design Report](https://www.overleaf.com/6835404kgznhmrnwdwq)
 
 ## System
 
@@ -70,8 +70,10 @@ git stash pop
 | 22/12/16 | 8 page Final Report Submission (LaTex)         |   - [ ] Final System Design<br> - [ ] Experimental results  analysis <br> - [ ] Compressed file with all experimental results & readme.md <br> - [ ] Bonus 5% video-Explain hypothesis, experimental findings, potential use cases <br>*Look at examples on BB*       |
 ## Similar Projects
 
- - ![MIT Mediator Software](http://hd.media.mit.edu/tech-reports/TR-616.pdf)
- - ![Ubiquitous Meeting Facilitator with Playful Real-Time User Interface](http://link.springer.com/chapter/10.1007%2F978-3-642-23641-9_3)
+ - [MIT Mediator Software](http://hd.media.mit.edu/tech-reports/TR-616.pdf)
+ - [Ubiquitous Meeting Facilitator with Playful Real-Time User Interface](http://link.springer.com/chapter/10.1007%2F978-3-642-23641-9_3)
+ - [Speaker Diarization (PyCASP?)](http://www.icsi.berkeley.edu/pubs/speech/fastspeakerdiarization11.pdf)
+ - [Robot Mediator](http://link.springer.com/article/10.1007/s10514-008-9101-z)
  
 ## Resources
 
