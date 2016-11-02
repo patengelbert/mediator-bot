@@ -76,6 +76,7 @@ git stash pop
  - [Robot Mediator for Classrooms](http://link.springer.com/article/10.1007/s10514-008-9101-z)
  - [Robot Mediator for 3 party conversation](http://www.sciencedirect.com/science/article/pii/S0885230814001260)
  - [Social Dynamics in multiparty conversations](http://onlinelibrary.wiley.com/doi/10.1111/j.1540-4560.1948.tb01783.x/abstract)
+ - [Microsoft is doing waht we want to](https://www.microsoft.com/en-us/research/project/meeting-recognition-and-understanding/)
  
 ## Resources
 
