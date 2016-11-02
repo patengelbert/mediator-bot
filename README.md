@@ -79,6 +79,8 @@ git stash pop
  
 ## Resources
 
+[Test Meetings](http://groups.inf.ed.ac.uk/ami/download/)
+
 Notes
  - https://www.quora.com/Can-I-do-speaker-recognition-project-with-python
  - https://www.quora.com/What-are-the-best-webcams-for-computer-vision-projects
