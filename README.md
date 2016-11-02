@@ -73,7 +73,9 @@ git stash pop
  - [MIT Mediator Software](http://hd.media.mit.edu/tech-reports/TR-616.pdf)
  - [Ubiquitous Meeting Facilitator with Playful Real-Time User Interface](http://link.springer.com/chapter/10.1007%2F978-3-642-23641-9_3)
  - [Speaker Diarization (PyCASP?)](http://www.icsi.berkeley.edu/pubs/speech/fastspeakerdiarization11.pdf)
- - [Robot Mediator](http://link.springer.com/article/10.1007/s10514-008-9101-z)
+ - [Robot Mediator for Classrooms](http://link.springer.com/article/10.1007/s10514-008-9101-z)
+ - [Robot Mediator for 3 party conversation](http://www.sciencedirect.com/science/article/pii/S0885230814001260)
+ - [Social Dynamics in multiparty conversations](http://onlinelibrary.wiley.com/doi/10.1111/j.1540-4560.1948.tb01783.x/abstract)
  
 ## Resources
 
