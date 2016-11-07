@@ -1,11 +1,9 @@
-from derpconf.config import Config, generate_config
+from mediator_bot.config.nested_config_parser import NestedConfigParser
 
 
-def loadConfig(bot, path=None):
-    conf = Config.load(path)
-    for conf_option, _ in conf.items.items():
-        bot.config[conf_option] = conf[conf_option]
+def loadConfig(bot, path='local.conf'):
+    conf = NestedConfigParser()
+    conf.read(path)
+    bot.config = conf.load()
 
 
-if __name__ == '__main__':
-    generate_config()
