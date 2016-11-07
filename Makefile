@@ -30,4 +30,5 @@ run:
 	python mediator_bot/bot.py -c mediator_bot/config/local.conf --debug
 
 tox:
+	. env/bin/activate && \
 	tox

@@ -1,9 +1,9 @@
-from mediator_bot.config.nested_config_parser import NestedConfigParser
+from mediator_bot.common.nested_config_parser import NestedConfigParser
 
 
-def loadConfig(bot, path='local.conf'):
+def loadConfig(path='local.conf'):
     conf = NestedConfigParser()
     conf.read(path)
-    bot.config = conf.load()
+    return conf.load()
 
 

@@ -14,8 +14,9 @@ Possible test - hold two separate meetings, one with a human mediator and one wi
 
 ## Requirements
 - Python 2.7
-- Make
+- Make ```sudo apt-get install make```
 - Python 2.7 virtualenv ```pip install virtualenv```
+- portaudio19-dev ```sudo apt-get install portaudio19-dev```
 
 ## Installation
 - Run ```make build```

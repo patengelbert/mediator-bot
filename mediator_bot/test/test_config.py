@@ -1,7 +1,7 @@
 import pytest
 from DictObject import DictObject
 
-from mediator_bot.config.nested_config_parser import NestedConfigParser
+from mediator_bot.common.nested_config_parser import NestedConfigParser
 
 
 @pytest.fixture
