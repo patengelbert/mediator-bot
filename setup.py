@@ -1,4 +1,6 @@
 import io
+
+import pytest
 from setuptools import setup, find_packages
 import mediator_bot
 
@@ -29,8 +31,8 @@ setup(
     long_description=long_description,
     packages=find_packages(),
     include_package_data=True,
+    setup_requires=['pytest-runner'],
     platforms='any',
-    test_suite='mediator_bot.test.test_mediator_bot',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
