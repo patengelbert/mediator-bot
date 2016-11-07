@@ -13,10 +13,9 @@ Using:
 Possible test - hold two separate meetings, one with a human mediator and one with the mediator-bot, gather participants' opinions on which was preferred.
 
 ## Requirements
-- Python 2.7 (Project should be compatible with both it and Python 3.4)
+- Python 2.7
 - Make
 - Python 2.7 virtualenv ```pip install virtualenv```
-- Python 2.7 Sphinx ```pip install sphinx```
 
 ## Installation
 - Run ```make build```

@@ -32,7 +32,6 @@ class MediatorBot(object):
         pass
 
 
-
 def parseArguments(args=None):
     if args is None:
         args = sys.argv[1:]
@@ -52,4 +51,4 @@ def parseArguments(args=None):
 if __name__ == '__main__':
     args = parseArguments()
     bot = MediatorBot(args.conf, args.bind, args.port, args.debug)
-    bot.run(args.p)
+    bot.run()
