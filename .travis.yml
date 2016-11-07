@@ -7,7 +7,7 @@ install:
     # portaudio is required for pyaudio
     - sudo apt-get install portaudio19-dev
 
-    - pip install -r requirements.txt --use-mirrors
+    - pip install -r requirements.txt
     - pip install coverage
     - pip install coveralls
 script:
