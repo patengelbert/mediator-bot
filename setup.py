@@ -28,7 +28,7 @@ setup(
     description='Mediator Robot for meeting rooms',
     long_description=long_description,
     packages=find_packages(),
-    include_package_data=False,
+    include_package_data=True,
     platforms='any',
     test_suite='mediator_bot.test.test_mediator_bot',
     classifiers=[
