@@ -94,3 +94,6 @@ env/
 
 # Vim files
 *.swp
+
+#ROS files
+/.rosinstall

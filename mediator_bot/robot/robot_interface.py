@@ -1,4 +1,0 @@
-
-
-class RobotInterface(object):
-    pass
