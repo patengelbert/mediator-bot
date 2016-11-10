@@ -60,7 +60,7 @@ env:
     - ROSINSTALL_FILE=$CI_SOURCE_PATH/dependencies.rosinstall
     - CATKIN_OPTIONS=$CI_SOURCE_PATH/catkin.options
     - ROS_PARALLEL_JOBS='-j8 -l6'
-    - BUILD_DIR="~/build"
+    - BUILD_DIR=$(pwd)/build
 
 ################################################################################
 
