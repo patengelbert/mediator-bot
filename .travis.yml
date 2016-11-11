@@ -46,9 +46,12 @@
 dist: trusty
 sudo: required
 language:
-  - generic
+  - python
+python:
+  - 2.7
 cache:
   - apt
+  - pip
 
 # Configuration variables. All variables are global now, but this can be used to
 # trigger a build matrix for different ROS distributions if desired.
@@ -86,8 +89,7 @@ install:
   - catkin_make
   - source devel/setup.bash
   # Add the package under integration to the workspace using a symlink.
-  - cd $BUILD_DIR/src
-  - ln -s $CI_SOURCE_PATH .
+  - ln -s $CI_SOURCE_PATH $BUILD_DIR/src
 
 # Install all dependencies, using wstool first and rosdep second.
 # wstool looks for a ROSINSTALL_FILE defined in the environment variables.
