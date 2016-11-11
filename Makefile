@@ -47,6 +47,8 @@ install-ros:
 setup-build: setup-env
 	@echo "Using build dir $(BUILD_DIR)"
 	mkdir -p $(BUILD_DIR)/src
+	mkdir -p $(BUILD_DIR)/build
+	ln -s $(shell pwd)/env $(BUILD_DIR)/build/catkin_pip_env
 # Create the devel/setup.bash (run catkin_make with an empty workspace)
 	( \
 	. $(BUILD_DIR)/build/catkin_pip_env/bin/activate ; \
