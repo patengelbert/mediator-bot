@@ -23,6 +23,15 @@ The actions of this library will include:
 The response library will need to receive one keyword and optionally the name of a single person (for seperating single people to speak).
 
 
-## System Diagram
+## Flow Diagram
 
 ![HCR_Libraries](https://github.com/patengelbert/mediator-bot/blob/master/images/HCR_Libraries.png?raw=true)
+
+## Simplified System Diagram
+
+![Simplified_HCR](https://github.com/patengelbert/mediator-bot/blob/jb-branch/images/Simplified_HCR.png?raw=true)
+
+## Component Report
+
+[Component_Report](https://www.overleaf.com/7034599jzfgqcnqbdwd)
+
