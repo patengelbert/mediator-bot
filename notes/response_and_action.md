@@ -10,6 +10,7 @@ The action operations will include:
 
 The action library will need to receive one keyword and optionally a direction for a single person (for pointing or singling out).
 
+
 ## Response Library
 
 This library contains operations for controlling non-movement reactions of the NAO. This will primarily be speech but might also include lighting of the LED sections or any other non-movement actions that the NAO is capable of. As with the Action Library, the responses will be grouped by a keyword and will be chosen at random should the group contain more than one operation.
@@ -20,3 +21,8 @@ The actions of this library will include:
 * Certain "keywords" are spoken, or certain emotions shown - related speech (this will depend on the keywords and emotions that we identify as requiring attention)
 
 The response library will need to receive one keyword and optionally the name of a single person (for seperating single people to speak).
+
+
+## System Diagram
+
+![HCR_Libraries](https://github.com/patengelbert/mediator-bot/blob/master/images/HCR_Libraries.png?raw=true)
