@@ -1,6 +1,6 @@
 #!/bin/bash
 
-.PHONY: docs release clean build test run
+.PHONY: docs release clean build test run setup-build install-ros setup-env install-dependencies full-build
 
 ROS_DISTRO=indigo
 ROS_CI_DESKTOP="`lsb_release -cs`"
