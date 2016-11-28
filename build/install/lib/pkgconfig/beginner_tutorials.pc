@@ -1,0 +1,8 @@
+prefix=/home/becks/mediator-bot/build/install
+
+Name: beginner_tutorials
+Description: Description of beginner_tutorials
+Version: 0.0.0
+Cflags: -I/home/becks/mediator-bot/build/install/include
+Libs: -L/home/becks/mediator-bot/build/install/lib 
+Requires: message_runtime

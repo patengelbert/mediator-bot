@@ -1,0 +1,2 @@
+beginner_tutorials
+-DCATKIN_DEVEL_PREFIX=/home/becks/mediator-bot/build/devel -DCMAKE_INSTALL_PREFIX=/home/becks/mediator-bot/build/install -G Unix Makefiles
