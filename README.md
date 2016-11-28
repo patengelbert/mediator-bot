@@ -64,8 +64,8 @@ git stash pop
 
 | Date          | Deadline          | Deliverables    |
 | ------------- |:-----------------| :--------------|
-| 3/11/16       | 4 page Design Report     | - [ ] Research Hypothesis with stats<br>  - [x] System Design Diagram<br>  - [ ] your proposed experimental validation methodology     |
-| 17/11/16    | 4 page Individual Component Paper         |  - [ ]     Report the state of the subcomponent you are responsible for <br> - [ ] Design to be followed for the subcomponent      |
+| 3/11/16       | 4 page Design Report     | - [x] Research Hypothesis with stats<br>  - [x] System Design Diagram<br>  - [x] your proposed experimental validation methodology     |
+| 17/11/16    | 4 page Individual Component Paper         |  - [x]     Report the state of the subcomponent you are responsible for <br> - [x] Design to be followed for the subcomponent      |
 | 15/12/16 | Final Presentation, Live demo          |   - [ ] It Works         |
 | 22/12/16 | 8 page Final Report Submission (LaTex)         |   - [ ] Final System Design<br> - [ ] Experimental results  analysis <br> - [ ] Compressed file with all experimental results & readme.md <br> - [ ] Bonus 5% video-Explain hypothesis, experimental findings, potential use cases <br>*Look at examples on BB*       |
 ## Similar Projects
