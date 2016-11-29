@@ -57,7 +57,7 @@ cache:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install libboost-dev
+  - sudo apt-get install libboost-dev libblitz0-dev
   - make install-ros
 
 install:
