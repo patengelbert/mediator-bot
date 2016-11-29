@@ -1,0 +1,5 @@
+mediator_bot:
+  settings:
+    frame_size: 512
+  etc:
+    example: "example"
