@@ -60,24 +60,37 @@ git stash pop
 
 ![System Overview](https://github.com/patengelbert/mediator-bot/raw/master/images/System Overview.png?raw=true)
 
-## UI TOPICS
-### Subscribed to
+## Topics
+
+### SPEAKER + SPEECH RECOGNITION TOPICS
+#### Subscribed to
+- "HarkSrcWave" topic, sends seperated stream data with azimuth. Msg type: "int":numChannels, "int":azimuth, ```float32[channelNum][frameLength]```
+- "Person_setup" topic, sends request to register a new person, Msg type: "string":label, "dict":meta_data(pronoun)
+#### Publishes
+- "Transcript" topic, sends the transcript of a certain stream, Msg type: timestamp (of input), "int":channel_id, "string":transcript
+- "Speaker" topic, sends the label and metadata of a certain stream, Msg type: timestamp(of input), "int":channel_id, "string":label, "dict":metadata
+- "Registration_complete" topic, sends the label and registration status, Msg type: "string":label, "bool":success, "int":time_spoken
+
+#### Notes
+- Timestamp + channel_id combination of published messages are guaranteed to refer to the same input (use to match a audio stream with speaker or speaker with transcript)
+- 
+### UI TOPICS
+#### Subscribed to
 - "Transcript" topic, sends what spoken, by who and when. Msg type: timestamp, "string":persons name, "string": speech spoken
 - "Action topic, sent when action occurs or mood changes. Msg type: "string": action type, "string mood": how happy is the system, "string" : person involved (opt) e.g. Sam stop talking over. He's done it 5 times so system mood is sad
 - "Percentage" topic, sent person and % they've spoken when changes sig. Msg type: "string":person name, "int" : percentage spoken
 - "Register_Person" topic, returns whether person successfully registered to system Msg type: "string": person name, "bool": 0/1 fail/success
-### Publishing to
+#### Publishing to
 - "Person_Setup" topic, sends when person trying to register to system
 
-Alternatively registered person/ person_setup could be done as a single send/response service?
-### System moods
+#### System moods
 * "Happy"
 * "Sad"
 * "Angry"
 * "Shocked"
 * "Neutral"
 
-### System Actions
+#### System Actions
 * "too_loud"
 * "too_quiet"
 * "speaking_over"
