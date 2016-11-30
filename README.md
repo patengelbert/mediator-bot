@@ -60,6 +60,30 @@ git stash pop
 
 ![System Overview](https://github.com/patengelbert/mediator-bot/raw/master/images/System Overview.png?raw=true)
 
+## UI TOPICS
+### Subscribed to
+- "Transcript" topic, sends what spoken, by who and when. Msg type: timestamp, "string":persons name, "string": speech spoken
+- "Action topic, sent when action occurs or mood changes. Msg type: "string": action type, "string mood": how happy is the system, "string" : person involved (opt) e.g. Sam stop talking over. He's done it 5 times so system mood is sad
+- "Percentage" topic, sent person and % they've spoken when changes sig. Msg type: "string":person name, "int" : percentage spoken
+- "Registered person" topic, returns whether person successfully registered to system Msg type: "string": person name, "bool": 0/1 fail/success
+### Publishing to
+- "Person_setup" topic, sends when person trying to register to system
+
+Alternatively registered person/ person_setup could be done as a single send/response service?
+### System moods
+* "Happy"
+* "Sad"
+* "Angry"
+* "Shocked"
+* "Neutral"
+
+### System Actions
+* "too_loud"
+* "too_quiet"
+* "speaking_over"
+* "dominated"
+
+
 ##Timeline
 
 | Date          | Deadline          | Deliverables    |
