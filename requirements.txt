@@ -14,7 +14,9 @@ pytest==3.0.3
 pytest-cov==2.4.0
 pytest-timeout==1.2.0
 python-dateutil==2.6.0
+PyYAML==3.12
 repoze.lru==0.6
+rospkg==1.0.41
 scikits.talkbox==0.2.5
 scipy==0.18.1
 six==1.10.0

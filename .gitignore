@@ -97,3 +97,11 @@ env/
 
 #ROS files
 /.rosinstall
+
+# Model files
+*.bin
+
+#Audio files
+*.wav
+*.raw
+*.mpeg
