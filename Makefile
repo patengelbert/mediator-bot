@@ -52,6 +52,8 @@ setup-build: setup-env
 # Create the devel/setup.bash (run catkin_make with an empty workspace)
 	( \
 	. $(BUILD_DIR)/build/catkin_pip_env/bin/activate ; \
+	sudo apt-get update -qq ; \
+	sudo apt-get install -y libboost-dev libblitz0-dev libopenblas-dev ; \
 	pip install --upgrade  -r requirements.txt ; \
 	. /opt/ros/$(ROS_DISTRO)/setup.sh ;  \
 	cd $(BUILD_DIR)/src ; \
