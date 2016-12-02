@@ -53,7 +53,7 @@ setup-build: setup-env
 	( \
 	. $(BUILD_DIR)/build/catkin_pip_env/bin/activate ; \
 	sudo apt-get update -qq ; \
-	sudo apt-get install -y libboost-dev libblitz0-dev libopenblas-dev ; \
+	sudo apt-get install -y libboost-all-dev libblitz0-dev libopenblas-dev ; \
 	pip install --upgrade  -r requirements.txt ; \
 	. /opt/ros/$(ROS_DISTRO)/setup.sh ;  \
 	cd $(BUILD_DIR)/src ; \
