@@ -9,9 +9,11 @@ import rospy
 from concurrent.futures import Future
 from googleapiclient import discovery
 from hark_msgs.msg import HarkSrcWave
+from speaker_recognition import SpeakerRecognizer
+from speaker_recognition.exceptions import FeatureExtractionException
 
 from periodic_thread import PeriodicThread
-from speech_recognition import Recognizer, AudioData
+from speech_recognition import AudioData
 
 import base64
 
@@ -22,10 +24,12 @@ FRAMELENGTH = 512
 SAMPLERATE = 16000
 DATATYPE = np.int16
 MINTRANSCRIBELENGTH = 1  # Note all transcriptions are billed in intervals of 15s
+MINDIARIZELENGTH = 1
 MAXREQUESTS = 14400 + 50000  # Free + Trial
 RPCPERIOD = 1
 TIMEOUT = 3
 MAXCONCURRENT = 2
+SPEAKERMODEL = "test_model.bin"
 
 DISCOVERY_URL = ('https://{api}.googleapis.com/$discovery/rest?'
                  'version={apiVersion}')
@@ -59,8 +63,11 @@ class RequestError(RecogniserNodeException):
     pass
 
 
-class GoogleSocketPool(object):
+class SpeakerRecognitionError(RecogniserNodeException):
+    pass
 
+
+class GoogleSocketPool(object):
     def __init__(self, poolSize=MAXCONCURRENT, timeout=TIMEOUT):
         self.sockets = []
         self.inUseSockets = []
@@ -171,7 +178,7 @@ class RPCDispatcher(object):
 
 
 class SrcStream(object):
-    def __init__(self, srcId, sampleRate, rpcDispatcher):
+    def __init__(self, srcId, sampleRate, rpcDispatcher, speakerRecogniser):
         self.rpcDispatcher = rpcDispatcher
         self.sampleRate = sampleRate
         self._speaker = None
@@ -180,6 +187,8 @@ class SrcStream(object):
         self.seqIds = []  # List of seqId, startSample, endSample
         self.active = True
         self._transcript = None
+        self.recogniser = speakerRecogniser
+        self.sentMessage = False
 
     def addFrame(self, seqId, src):
         if src.id != self.srcId:
@@ -201,13 +210,39 @@ class SrcStream(object):
         # End of data for this stream
         rospy.loginfo("End of data for stream {} after {}s".format(self.srcId, self.duration))
         if self.duration > MINTRANSCRIBELENGTH:
-            # TODO send message if speaker also recognised
-            rospy.loginfo(self.transcript)
+            self.getSpeaker(allowShortDuration=True)
+            rospy.loginfo("{} -> {}".format(self.getSpeaker(allowShortDuration=True), self.transcript))
+        self.sentMessage = True
+
+    @property
+    def hasKnownSpeaker(self):
+        return self._speaker is not None
 
     @property
     def speaker(self):
+        return self.getSpeaker()
+
+    def getSpeaker(self, allowShortDuration=False):
         if self._speaker is not None:
             return self._speaker
+
+        if not allowShortDuration and self.duration < MINDIARIZELENGTH:
+            raise SpeakerRecognitionError(
+                "Stream {} is too short to recognise the speaker. {} < {}".format(self.srcId, self.duration,
+                                                                                  MINDIARIZELENGTH))
+
+        rospy.loginfo("Beginning speaker recognition for stream {}".format(self.srcId))
+
+        audioData = self.getAudioData()
+
+        try:
+            self._speaker = self.recogniser.predict(audioData)
+        except FeatureExtractionException as e:
+            rospy.logerr(e)
+        return self._speaker
+
+    def getAudioData(self):
+        return AudioData(np.array(self.data, np.int16).tostring(), SAMPLERATE, 2)
 
     def hasTranscript(self):
         return self._transcript is not None
@@ -226,18 +261,18 @@ class SrcStream(object):
 
         rospy.loginfo("Beginning transcription for stream {}".format(self.srcId))
 
-        audioData = AudioData(np.array(self.data, np.int16).tostring(), SAMPLERATE, 2)
+        audioData = self.getAudioData()
 
         transcript = self.rpcDispatcher.queueRequest({
-                'config': {
-                    'encoding': 'LINEAR16',  # raw 16-bit signed LE samples
-                    'sampleRate': audioData.sample_rate,  # 16 khz
-                    'languageCode': 'en-US',  # a BCP-47 language tag
-                },
-                'audio': {
-                    'content': base64.b64encode(audioData.get_raw_data()).decode('UTF-8')
-                }
-            })
+            'config': {
+                'encoding': 'LINEAR16',  # raw 16-bit signed LE samples
+                'sampleRate': audioData.sample_rate,  # 16 khz
+                'languageCode': 'en-US',  # a BCP-47 language tag
+            },
+            'audio': {
+                'content': base64.b64encode(audioData.get_raw_data()).decode('UTF-8')
+            }
+        })
         # TODO convert transcript JSON into usable data
         self._transcript = transcript.result()
         return self._transcript
@@ -256,11 +291,13 @@ class SrcStream(object):
 
 class Node(object):
     def __init__(self):
-        self.srcStreams = {}
+        self.srcStreams = dict()
         self.activeStreams = set()
         self.streamLock = threading.Lock()
 
         self.rpcDispatcher = RPCDispatcher()
+        self.recogniser = SpeakerRecognizer()
+        self.model = SPEAKERMODEL
 
     def addToStreams(self, data):
         with self.streamLock:
@@ -273,7 +310,7 @@ class Node(object):
                 for srcStream in data.src:
                     streamId = srcStream.id
                     if streamId not in self.srcStreams.keys():
-                        self.srcStreams[streamId] = SrcStream(streamId, SAMPLERATE, self.rpcDispatcher)
+                        self.srcStreams[streamId] = SrcStream(streamId, SAMPLERATE, self.rpcDispatcher, self.recogniser)
                         self.activeStreams.add(streamId)
                     self.srcStreams[streamId].addFrame(data.header.seq, srcStream)
                     updatedStreams.add(streamId)
@@ -282,14 +319,46 @@ class Node(object):
                     self.activeStreams.remove(streamId)
                     self.srcStreams[streamId].endStream()
 
+    # def checkSpeakers(self):
+    #     with self.streamLock:
+    #         for stream in self.srcStreams:
+
+    def cleanStreams(self):
+        # Remove all streams that are no longer needed
+        with self.streamLock:
+            notFinishedStreams = dict(
+                (streamId, stream) for streamId, stream in self.srcStreams.iteritems() if not stream.sentMessage)
+            if len(self.srcStreams) != len(notFinishedStreams):
+                cleanedIds = [str(streamId) for streamId in self.srcStreams.iterkeys() if
+                              streamId not in notFinishedStreams.keys()]
+                rospy.loginfo("Cleaning up streams {}".format(','.join(cleanedIds)))
+            self.srcStreams = notFinishedStreams
+
     def start(self):
         self.rpcDispatcher.start()
         rospy.init_node('SpeakerSpeechNode')
         rospy.on_shutdown(self.rpcDispatcher.stop)
+
+        if self.model is not None:
+            try:
+                self.recogniser = SpeakerRecognizer.load(self.model)
+                rospy.loginfo("Loaded speaker model {}".format(self.model))
+            except IOError:
+                rospy.logwarn("No model file '{}' found for existing speakers.".format(self.model))
+                rospy.logwarn("Please enroll people before starting detection")
+
         rospy.Subscriber("HarkSrcWave", HarkSrcWave, self.addToStreams)
 
         rospy.loginfo("Running")
+
+        rate = rospy.Rate(1)
+        while not rospy.is_shutdown():
+            rate.sleep()
+            # self.checkSpeakers()
+            self.cleanStreams()
+
         rospy.spin()
+
 
 if __name__ == '__main__':
     node = Node()
