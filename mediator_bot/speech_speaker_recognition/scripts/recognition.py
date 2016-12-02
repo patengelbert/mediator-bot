@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 import threading
+from Queue import Queue, Full
 from collections import deque
 from contextlib import contextmanager
 
 import httplib2
 import numpy as np
 import rospy
+import time
 from concurrent.futures import Future
 from googleapiclient import discovery
 from hark_msgs.msg import HarkSrcWave
@@ -67,6 +69,18 @@ class SpeakerRecognitionError(RecogniserNodeException):
     pass
 
 
+class WouldBlockError(Exception):
+    pass
+
+
+class LockTimeoutException(Exception):
+    pass
+
+
+class RequestMethodError(RecogniserNodeException):
+    pass
+
+
 class GoogleSocketPool(object):
     def __init__(self, poolSize=MAXCONCURRENT, timeout=TIMEOUT):
         self.sockets = []
@@ -74,7 +88,7 @@ class GoogleSocketPool(object):
         self.credentials = GoogleCredentials.get_application_default().create_scoped(
             ['https://www.googleapis.com/auth/cloud-platform'])
 
-        self.numSockets = threading.Semaphore(poolSize)
+        self.numSockets = TimeoutSemaphore(poolSize)
 
         for _ in xrange(poolSize):
             http = httplib2.Http(timeout=timeout, disable_ssl_certificate_validation=True)
@@ -83,8 +97,15 @@ class GoogleSocketPool(object):
 
     @contextmanager
     def getSocket(self):
-        rospy.logdebug("Retreiving Socket")
-        self.numSockets.acquire()
+        rospy.logdebug("Retrieving Socket")
+
+        try:
+            self.numSockets.acquire()
+        except LockTimeoutException as e:
+            rospy.logerr(e)
+            print e
+            raise
+
         socket = self.sockets.pop()
         self.inUseSockets.append(socket)
         yield socket
@@ -94,8 +115,45 @@ class GoogleSocketPool(object):
         self.numSockets.release()
 
 
-class RequestMethodError(RecogniserNodeException):
-    pass
+
+class TimeoutSemaphore(object):
+
+    def __init__(self, size=1, timeout=5):
+        self.timeout = timeout
+        self.queue = Queue(maxsize=size)
+        for _ in xrange(size):
+            self.release()
+
+    def acquire(self, blocking=True):
+        try:
+            self.queue.get(block=blocking, timeout=self.timeout)
+        except Full as e:
+            raise LockTimeoutException(str(e))
+
+    def release(self):
+        self.queue.put(1, block=False)
+
+
+class TimoutLock(TimeoutSemaphore):
+
+    def __init__(self, timeout=5):
+        super(TimoutLock, self).__init__(size=1, timeout=timeout)
+
+    def __enter__(self):
+        self.acquire()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.release()
+
+
+@contextmanager
+def non_blocking_lock(lock=TimoutLock()):
+    if not lock.acquire(blocking=False):
+        raise WouldBlockError()
+    try:
+        yield lock
+    finally:
+        lock.release()
 
 
 class RPCDispatcher(object):
@@ -105,8 +163,8 @@ class RPCDispatcher(object):
     def __init__(self, period=RPCPERIOD, timeout=TIMEOUT, maxConcurrentRequests=MAXCONCURRENT):
         self.queue = deque()
         self.thread = PeriodicThread(self._sendRequest, period=period)
-        self.queueLock = threading.Lock()
-        self.threadLock = threading.Lock()
+        self.queueLock = TimoutLock()
+        self.threadLock = TimoutLock()
         self.activeRequests = []
 
         self.socketPool = GoogleSocketPool(maxConcurrentRequests, timeout)
@@ -190,6 +248,9 @@ class SrcStream(object):
         self.recogniser = speakerRecogniser
         self.sentMessage = False
 
+        self.speakerLock = TimoutLock()
+        self.transcriptionLock = TimoutLock()
+
     def addFrame(self, seqId, src):
         if src.id != self.srcId:
             raise InvalidSrcException(
@@ -212,9 +273,8 @@ class SrcStream(object):
         if self.duration > MINTRANSCRIBELENGTH:
             self.getSpeaker(allowShortDuration=True)
             rospy.loginfo("{} -> {}".format(self.getSpeaker(allowShortDuration=True), self.transcript))
-        self.sentMessage = True
+        self.sentMessage = (self.hasTranscript() or self.duration < MINTRANSCRIBELENGTH) and self.hasKnownSpeaker()
 
-    @property
     def hasKnownSpeaker(self):
         return self._speaker is not None
 
@@ -223,23 +283,23 @@ class SrcStream(object):
         return self.getSpeaker()
 
     def getSpeaker(self, allowShortDuration=False):
-        if self._speaker is not None:
+        with self.speakerLock:
+            if self._speaker is not None:
+                return self._speaker
+
+            if not allowShortDuration and self.duration < MINDIARIZELENGTH:
+                raise SpeakerRecognitionError(
+                    "Stream {} is too short to recognise the speaker. {} < {}".format(self.srcId, self.duration,
+                                                                                      MINDIARIZELENGTH))
+
+            rospy.loginfo("Beginning speaker recognition for stream {}".format(self.srcId))
+
+            try:
+                audioData = self.getAudioData()
+                self._speaker = self.recogniser.predict(audioData)
+            except FeatureExtractionException as e:
+                rospy.logerr(e)
             return self._speaker
-
-        if not allowShortDuration and self.duration < MINDIARIZELENGTH:
-            raise SpeakerRecognitionError(
-                "Stream {} is too short to recognise the speaker. {} < {}".format(self.srcId, self.duration,
-                                                                                  MINDIARIZELENGTH))
-
-        rospy.loginfo("Beginning speaker recognition for stream {}".format(self.srcId))
-
-        audioData = self.getAudioData()
-
-        try:
-            self._speaker = self.recogniser.predict(audioData)
-        except FeatureExtractionException as e:
-            rospy.logerr(e)
-        return self._speaker
 
     def getAudioData(self):
         return AudioData(np.array(self.data, np.int16).tostring(), SAMPLERATE, 2)
@@ -249,33 +309,34 @@ class SrcStream(object):
 
     @property
     def transcript(self):
-        if self._transcript is not None:
+        with self.transcriptionLock:
+            if self._transcript is not None:
+                return self._transcript
+
+            if self.active:
+                raise SrcStreamStillActiveException(
+                    "Stream {} cannot be transcribed while it is still active".format(self.srcId))
+            if self.duration < MINTRANSCRIBELENGTH:
+                raise TranscriptionError(
+                    "Stream {} is too short to transcribe {} < {}".format(self.srcId, self.duration, MINTRANSCRIBELENGTH))
+
+            rospy.loginfo("Beginning transcription for stream {}".format(self.srcId))
+
+            audioData = self.getAudioData()
+
+            transcript = self.rpcDispatcher.queueRequest({
+                'config': {
+                    'encoding': 'LINEAR16',  # raw 16-bit signed LE samples
+                    'sampleRate': audioData.sample_rate,  # 16 khz
+                    'languageCode': 'en-US',  # a BCP-47 language tag
+                },
+                'audio': {
+                    'content': base64.b64encode(audioData.get_raw_data()).decode('UTF-8')
+                }
+            })
+            # TODO convert transcript JSON into usable data
+            self._transcript = transcript.result(timeout=5)
             return self._transcript
-
-        if self.active:
-            raise SrcStreamStillActiveException(
-                "Stream {} cannot be transcribed while it is still active".format(self.srcId))
-        if self.duration < MINTRANSCRIBELENGTH:
-            raise TranscriptionError(
-                "Stream {} is too short to transcribe {} < {}".format(self.srcId, self.duration, MINTRANSCRIBELENGTH))
-
-        rospy.loginfo("Beginning transcription for stream {}".format(self.srcId))
-
-        audioData = self.getAudioData()
-
-        transcript = self.rpcDispatcher.queueRequest({
-            'config': {
-                'encoding': 'LINEAR16',  # raw 16-bit signed LE samples
-                'sampleRate': audioData.sample_rate,  # 16 khz
-                'languageCode': 'en-US',  # a BCP-47 language tag
-            },
-            'audio': {
-                'content': base64.b64encode(audioData.get_raw_data()).decode('UTF-8')
-            }
-        })
-        # TODO convert transcript JSON into usable data
-        self._transcript = transcript.result()
-        return self._transcript
 
     def __len__(self):
         return self.length
@@ -321,17 +382,19 @@ class Node(object):
 
     # def checkSpeakers(self):
     #     with self.streamLock:
-    #         for stream in self.srcStreams:
 
     def cleanStreams(self):
         # Remove all streams that are no longer needed
+        # This takes in the region of ~1ms so should't block the ROS event thread majorly
         with self.streamLock:
             notFinishedStreams = dict(
                 (streamId, stream) for streamId, stream in self.srcStreams.iteritems() if not stream.sentMessage)
+
             if len(self.srcStreams) != len(notFinishedStreams):
                 cleanedIds = [str(streamId) for streamId in self.srcStreams.iterkeys() if
                               streamId not in notFinishedStreams.keys()]
                 rospy.loginfo("Cleaning up streams {}".format(','.join(cleanedIds)))
+
             self.srcStreams = notFinishedStreams
 
     def start(self):
@@ -356,8 +419,6 @@ class Node(object):
             rate.sleep()
             # self.checkSpeakers()
             self.cleanStreams()
-
-        rospy.spin()
 
 
 if __name__ == '__main__':
