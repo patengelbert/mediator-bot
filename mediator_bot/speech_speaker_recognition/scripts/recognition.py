@@ -4,6 +4,7 @@ from Queue import Queue, Empty
 from collections import deque
 from contextlib import contextmanager
 
+import std_msgs.msg
 import httplib2
 import numpy as np
 import rospy
@@ -12,6 +13,7 @@ from googleapiclient import discovery
 from hark_msgs.msg import HarkSrcWave
 from speaker_recognition import SpeakerRecognizer
 from speaker_recognition.exceptions import FeatureExtractionException
+from speech_speaker_recognition.msg import SentenceTranscription, Speaker
 
 from periodic_thread import PeriodicThread
 from speech_recognition import AudioData
@@ -200,7 +202,7 @@ class RPCDispatcher(object):
             except IndexError:
                 rospy.logdebug("No pending requests")
                 return
-        rospy.loginfo("Sending next request")
+        rospy.logdebug("Sending next request")
         # Google does not support asynchronous requests so transform it into one that does, also fetch token
         thread = threading.Thread(target=self.__sendRequest, args=(request, future))
         rospy.logdebug("Getting thread lock on send request")
@@ -214,7 +216,7 @@ class RPCDispatcher(object):
         try:
             with self.createGoogleRequest() as request:
                 service = request.speech().syncrecognize(body=body)
-                rospy.loginfo("Sending request for thread {}".format(thread.name))
+                rospy.logdebug("Sending request for thread {}".format(thread.name))
                 response = service.execute()
         except Exception as e:
             rospy.logdebug("Getting thread lock on send request within thread {}".format(thread.name))
@@ -223,7 +225,7 @@ class RPCDispatcher(object):
                 self.activeRequests.remove(thread)
             future.set_exception(e)
             return
-        rospy.loginfo("Received response {} for thread {}".format(response, thread.name))
+        rospy.logdebug("Received response {} for thread {}".format(response, thread.name))
         future.set_result(response)
         rospy.logdebug("Getting thread lock on send request within thread {}".format(thread.name))
         with self.threadLock:
@@ -252,7 +254,7 @@ errorSpeaker = _ErrorSpeaker()
 
 
 class SrcStream(object):
-    def __init__(self, srcId, sampleRate, rpcDispatcher, speakerRecogniser):
+    def __init__(self, srcId, sampleRate, rpcDispatcher, speakerRecogniser, startTime):
         self.rpcDispatcher = rpcDispatcher
         self.sampleRate = sampleRate
         self._speaker = None
@@ -269,7 +271,10 @@ class SrcStream(object):
 
         self.transcriptFuture = None
 
-    def addFrame(self, seqId, src):
+        self.start = startTime
+        self.end = None
+
+    def addFrame(self, seqId, timeStamp, src):
         if src.id != self.srcId:
             raise InvalidSrcException(
                 "Cannot attach frame from source stream {} to frames of source stream {}".format(src.id, self.srcId))
@@ -277,15 +282,16 @@ class SrcStream(object):
             raise SrcStreamEndedException("Cannot attach frame to ended source stream {}".format(self.srcId))
 
         if src is None:
-            self.endStream()
+            self.endStream(timeStamp)
         else:
             with self.dataLock:
-                self.seqIds.append((seqId, self.length, self.length + src.length - 1))
+                self.seqIds.append(seqId)
                 self.data += src.wavedata
 
-    def endStream(self):
+    def endStream(self, timeStamp):
         if not self.active:
             raise SrcStreamEndedException("Stream {} has already been ended".format(self.srcId))
+        self.end = timeStamp
         self.active = False
         # End of data for this stream
         rospy.loginfo("End of data for stream {} after {}s".format(self.srcId, self.duration))
@@ -327,12 +333,15 @@ class SrcStream(object):
     def doTranscription(self, forceRetry=False, async=False):
         self.transcriptionLock.acquire()
         if self._transcript is not None and not forceRetry:
+            self.transcriptionLock.release()
             return self._transcript
         else:
             if self.active:
+                self.transcriptionLock.release()
                 raise SrcStreamStillActiveException(
                     "Stream {} cannot be transcribed while it is still active".format(self.srcId))
             if self.duration < MINTRANSCRIBELENGTH:
+                self.transcriptionLock.release()
                 raise TranscriptionError(
                     "Stream {} is too short to transcribe {} < {}".format(self.srcId, self.duration,
                                                                           MINTRANSCRIBELENGTH))
@@ -364,9 +373,12 @@ class SrcStream(object):
         return None
 
     def waitForTranscription(self):
-        # TODO convert transcript JSON into usable data
         try:
-            self._transcript = self.transcriptFuture.result(timeout=TIMEOUT)
+            rv = self.transcriptFuture.result(timeout=TIMEOUT)
+            if len(rv.get('results', [])) > 0 and len(rv['results'][0].get('alternatives', [])) > 0:
+                self._transcript = rv['results'][0]['alternatives'][0]['transcript']
+            else:
+                self._transcript = errorTranscript
         except Exception as e:
             if isinstance(e, TimeoutError):
                 rospy.logerr("Timed out waiting for result of transcription for stream {}".format(self.srcId))
@@ -407,25 +419,29 @@ class Node(object):
         self.model = SPEAKERMODEL
         self.transcribingStreams = []
 
+        self.transcriptionPublisher = rospy.Publisher('transcriptions', SentenceTranscription, queue_size=10)
+        self.speakerPublisher = rospy.Publisher('speaker', Speaker, queue_size=10)
+
     def addToStreams(self, data):
         with self.streamLock:
             if data.exist_src_num == 0:
                 for streamId in self.activeStreams:
-                    self.srcStreams[streamId].endStream()
+                    self.srcStreams[streamId].endStream(data.header.stamp)
                 self.activeStreams.clear()
             else:
                 updatedStreams = set()
                 for srcStream in data.src:
                     streamId = srcStream.id
                     if streamId not in self.srcStreams.keys():
-                        self.srcStreams[streamId] = SrcStream(streamId, SAMPLERATE, self.rpcDispatcher, self.recogniser)
+                        self.srcStreams[streamId] = SrcStream(streamId, SAMPLERATE, self.rpcDispatcher, self.recogniser,
+                                                              data.header.stamp)
                         self.activeStreams.add(streamId)
-                    self.srcStreams[streamId].addFrame(data.header.seq, srcStream)
+                    self.srcStreams[streamId].addFrame(data.header.seq, data.header.stamp, srcStream)
                     updatedStreams.add(streamId)
 
                 for streamId in [sid for sid in self.activeStreams if sid not in updatedStreams]:
                     self.activeStreams.remove(streamId)
-                    self.srcStreams[streamId].endStream()
+                    self.srcStreams[streamId].endStream(data.header.stamp)
 
     def checkStreams(self):
         with self.streamLock:
@@ -439,18 +455,57 @@ class Node(object):
                     transcript = stream.checkTranscription()
                     if transcript is not None:
                         self.transcribingStreams.remove(stream.srcId)
-                        # TODO Send message if speaker recognised
                 else:
                     stream.doTranscription(async=True)
                     self.transcribingStreams.append(stream.srcId)
             if doSpeakerRecognition:
                 stream.getSpeaker()
-                # TODO Send message
-            else:
+            if not doTranscription and not doSpeakerRecognition:
                 rospy.logdebug("Stream {} too short to process".format(stream.srcId))
+            self.sendMessages(stream)
             rospy.logdebug("{} -> {}: {}".format(stream.srcId,
-                                                 stream.speaker if stream.hasKnownSpeaker() else "<Unknown Speaker>",
-                                                 stream.transcription if stream.hasTranscription() else "<Unknown Transcript>"))
+                                                stream.speaker if stream.hasKnownSpeaker() else "<Unknown Speaker>",
+                                                stream.transcription if stream.hasTranscription() else "<Unknown Transcript>"))
+
+    def sendMessages(self, stream):
+        if stream.hasTranscription() and stream.hasKnownSpeaker():
+            # Send the final transcript message
+            message = SentenceTranscription()
+            message.header = std_msgs.msg.Header()
+            message.header.stamp=rospy.Time.now()
+            message.sentence_id = 0  # TODO actually figure out what the sentence ids are
+            message.stream_id = stream.srcId
+            message.frame_ids = stream.seqIds
+            message.start = stream.start
+            message.end = stream.end
+            message.duration = stream.duration
+            message.speaker = stream.speaker
+            message.sentence = stream.transcription
+            try:
+                rospy.logdebug("Sending ros topic\n'{}'".format(str(message)))
+                self.transcriptionPublisher.publish(message)
+            except rospy.ROSSerializationException as e:
+                rospy.logerr("Unable to send message: {}".format(e))
+                raise
+        elif stream.hasKnownSpeaker():
+            # Send intermediate message
+            # Send the final transcript message
+            message = Speaker()
+            message.header = std_msgs.msg.Header()
+            message.header.stamp=rospy.Time.now()
+            message.stream_id = stream.srcId
+            message.frame_ids = stream.seqIds
+            message.start = stream.start
+            message.end = stream.end if stream.end is not None else stream.start
+            message.active = stream.end is not None
+            message.duration = stream.duration
+            message.speaker = stream.speaker
+            try:
+                rospy.logdebug("Sending ros topic\n'{}'".format(str(message)))
+                self.speakerPublisher.publish(message)
+            except rospy.ROSSerializationException as e:
+                rospy.logerr("Unable to send message: {}".format(e))
+                raise
 
     def cleanStreams(self):
         # Remove all streams that are no longer needed
@@ -462,7 +517,7 @@ class Node(object):
             if len(self.srcStreams) != len(notFinishedStreams):
                 cleanedIds = [str(streamId) for streamId in self.srcStreams.iterkeys() if
                               streamId not in notFinishedStreams.keys()]
-                rospy.loginfo("Cleaning up streams {}".format(','.join(cleanedIds)))
+                rospy.logdebug("Cleaning up streams {}".format(','.join(cleanedIds)))
 
             self.srcStreams = notFinishedStreams
 
@@ -492,4 +547,7 @@ class Node(object):
 
 if __name__ == '__main__':
     node = Node()
-    node.start()
+    try:
+        node.start()
+    except rospy.ROSInterruptException:
+        rospy.loginfo("Interrupted")

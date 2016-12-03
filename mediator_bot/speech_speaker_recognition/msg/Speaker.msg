@@ -1,0 +1,8 @@
+Header header
+uint32 stream_id
+uint32[] frame_ids
+time start
+time end
+bool active
+float64 duration
+string speaker
