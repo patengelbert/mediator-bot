@@ -322,6 +322,7 @@ class SrcStream(object):
             except FeatureExtractionException as e:
                 rospy.logerr(e)
                 self._speaker = errorSpeaker
+            rospy.loginfo("Completed speaker recognition for stream {}".format(self.srcId))
             return self._speaker
 
     def getAudioData(self):
@@ -386,6 +387,7 @@ class SrcStream(object):
                 rospy.logerr("Error fetching transcript for stream {}: {}".format(self.srcId, e))
             self._transcript = errorTranscript
         self.transcriptionLock.release()
+        rospy.loginfo("Completed transcription for stream {}".format(self.srcId))
         return self._transcript
 
     @property
