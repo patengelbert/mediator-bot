@@ -69,7 +69,7 @@ setup-build: setup-env
 	catkin_make ; \
 	)
 # Add the project to the workspace using a symlink.
-	-ln -s $(CI_SOURCE_PATH) $(BUILD_DIR)/
+	-ln -s $(CI_SOURCE_PATH) $(BUILD_DIR)/src
 	@echo "Setup Build complete"
 
 install-dependencies:
