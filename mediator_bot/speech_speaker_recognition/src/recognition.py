@@ -1,413 +1,21 @@
 #!/usr/bin/env python
 import threading
-from Queue import Queue, Empty
-from collections import deque
-from contextlib import contextmanager
 
-import std_msgs.msg
-import httplib2
-import numpy as np
 import rospy
-from concurrent.futures import Future, TimeoutError
-from googleapiclient import discovery
+import std_msgs.msg
 from hark_msgs.msg import HarkSrcWave
 from speaker_recognition import SpeakerRecognizer
-from speaker_recognition.exceptions import FeatureExtractionException
 from speech_speaker_recognition.msg import SentenceTranscription, Speaker
 
-from periodic_thread import PeriodicThread
-from speech_recognition import AudioData
-
-import base64
-
-from oauth2client.client import GoogleCredentials
-
-# Change this to config file
-FRAMELENGTH = 512
-SAMPLERATE = 16000
-DATATYPE = np.int16
-MINTRANSCRIBELENGTH = 1  # Note all transcriptions are billed in intervals of 15s
-MINDIARIZELENGTH = 1
-MAXREQUESTS = 14400 + 50000  # Free + Trial
-RPCPERIOD = 0.5
-TIMEOUT = 10
-MAXCONCURRENT = 4
-SPEAKERMODEL = "test_model.bin"
-
-DISCOVERY_URL = ('https://{api}.googleapis.com/$discovery/rest?'
-                 'version={apiVersion}')
-
-
-class RecogniserNodeException(Exception):
-    def __init__(self, what="Exception in Recogniser Node"):
-        self.what = what
-
-    def __str__(self):
-        return self.what
-
-
-class InvalidSrcException(RecogniserNodeException):
-    pass
-
-
-class SrcStreamEndedException(RecogniserNodeException):
-    pass
-
-
-class SrcStreamStillActiveException(RecogniserNodeException):
-    pass
-
-
-class TranscriptionError(RecogniserNodeException):
-    pass
-
-
-class RequestError(RecogniserNodeException):
-    pass
-
-
-class SpeakerRecognitionError(RecogniserNodeException):
-    pass
-
-
-class WouldBlockError(Exception):
-    pass
-
-
-class LockTimeoutException(Exception):
-    pass
-
-
-class RequestMethodError(RecogniserNodeException):
-    pass
-
-
-class UnknownObjectError(Exception):
-    pass
-
-
-class GoogleSocketPool(object):
-    def __init__(self, poolSize=MAXCONCURRENT, timeout=TIMEOUT):
-        self.sockets = []
-        self.inUseSockets = []
-        self.credentials = GoogleCredentials.get_application_default().create_scoped(
-            ['https://www.googleapis.com/auth/cloud-platform'])
-
-        self.numSockets = TimeoutSemaphore(poolSize)
-
-        for _ in xrange(poolSize):
-            http = httplib2.Http(timeout=timeout, disable_ssl_certificate_validation=True)
-            self.credentials.authorize(http)
-            self.sockets.append(http)
-
-    @contextmanager
-    def getSocket(self):
-        rospy.logdebug("Retrieving Socket")
-
-        try:
-            self.numSockets.acquire()
-        except LockTimeoutException as e:
-            rospy.logerr(e)
-            raise
-
-        socket = self.sockets.pop()
-        self.inUseSockets.append(socket)
-        yield socket
-        rospy.logdebug("Releasing Socket")
-        self.inUseSockets.remove(socket)
-        self.sockets.append(socket)
-        self.numSockets.release()
-
-
-class TimeoutSemaphore(object):
-    def __init__(self, size=1, timeout=TIMEOUT):
-        self.timeout = timeout
-        self.queue = Queue(maxsize=size)
-        for _ in xrange(size):
-            self.release()
-
-    def acquire(self, blocking=True):
-        try:
-            self.queue.get(block=blocking, timeout=self.timeout)
-        except Empty as e:
-            raise LockTimeoutException(str(e))
-
-    def release(self):
-        self.queue.put(1, block=False)
-
-
-class TimeoutLock(TimeoutSemaphore):
-    def __init__(self, timeout=TIMEOUT):
-        super(TimeoutLock, self).__init__(size=1, timeout=timeout)
-
-    def __enter__(self):
-        self.acquire()
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.release()
-
-
-@contextmanager
-def non_blocking_lock(lock=TimeoutLock()):
-    if not lock.acquire(blocking=False):
-        raise WouldBlockError()
-    try:
-        yield lock
-    finally:
-        lock.release()
-
-
-class RPCDispatcher(object):
-    # Responsible for queueing up requests and passing the response back correctly
-    # Mainly it is there so as to not overflow the Google capacity for our service (I don't want to have pay)
-
-    def __init__(self, period=RPCPERIOD, timeout=TIMEOUT, maxConcurrentRequests=MAXCONCURRENT):
-        self.queue = deque()
-        self.thread = PeriodicThread(self._sendRequest, period=period)
-        self.queueLock = TimeoutLock()
-        self.threadLock = TimeoutLock()
-        self.activeRequests = []
-
-        self.socketPool = GoogleSocketPool(maxConcurrentRequests, timeout)
-
-    @contextmanager
-    def createGoogleRequest(self):
-        with self.socketPool.getSocket() as http:
-            yield discovery.build('speech', 'v1beta1', http=http, discoveryServiceUrl=DISCOVERY_URL)
-
-    def start(self):
-        self.thread.start()
-
-    def stop(self):
-        self.thread.cancel()
-        with self.threadLock:
-            activeRequests = self.activeRequests
-        for request in activeRequests:
-            request.join()
-
-    def queueRequest(self, request):
-        future = Future()
-        rospy.logdebug("Getting queue lock in queue request")
-        with self.queueLock:
-            rospy.logdebug("Got queue lock in queue request")
-            self.queue.appendleft((request, future))
-        return future
-
-    def _sendRequest(self):
-        rospy.logdebug("Getting queue lock in send request")
-        with self.queueLock:
-            rospy.logdebug("Got queue lock in send request")
-            try:
-                request, future = self.queue.pop()
-            except IndexError:
-                rospy.logdebug("No pending requests")
-                return
-        rospy.logdebug("Sending next request")
-        # Google does not support asynchronous requests so transform it into one that does, also fetch token
-        thread = threading.Thread(target=self.__sendRequest, args=(request, future))
-        rospy.logdebug("Getting thread lock on send request")
-        with self.threadLock:
-            rospy.logdebug("Got thread lock on send request")
-            self.activeRequests.append(thread)
-            thread.start()
-
-    def __sendRequest(self, body, future):
-        thread = threading.currentThread()
-        try:
-            with self.createGoogleRequest() as request:
-                service = request.speech().syncrecognize(body=body)
-                rospy.logdebug("Sending request for thread {}".format(thread.name))
-                response = service.execute()
-        except Exception as e:
-            rospy.logdebug("Getting thread lock on send request within thread {}".format(thread.name))
-            with self.threadLock:
-                rospy.logdebug("Got thread lock on send request within thread {}".format(thread.name))
-                self.activeRequests.remove(thread)
-            future.set_exception(e)
-            return
-        rospy.logdebug("Received response {} for thread {}".format(response, thread.name))
-        future.set_result(response)
-        rospy.logdebug("Getting thread lock on send request within thread {}".format(thread.name))
-        with self.threadLock:
-            rospy.logdebug("Got thread lock on send request within thread {}".format(thread.name))
-            self.activeRequests.remove(thread)
-
-
-class _ErrorTranscript(object):
-    def __str__(self):
-        return "<Error Fetching Transcript>"
-
-    def __eq__(self, other):
-        raise UnknownObjectError("Cannot compare unknown transcript")
-
-
-class _ErrorSpeaker(object):
-    def __str__(self):
-        return "<Error Fetching Speaker>"
-
-    def __eq__(self, other):
-        raise UnknownObjectError("Cannot compare unknown speaker")
-
-
-errorTranscript = _ErrorTranscript()
-errorSpeaker = _ErrorSpeaker()
-
-
-class SrcStream(object):
-    def __init__(self, srcId, sampleRate, rpcDispatcher, speakerRecogniser, startTime):
-        self.rpcDispatcher = rpcDispatcher
-        self.sampleRate = sampleRate
-        self._speaker = None
-        self.srcId = srcId
-        self.data = []
-        self.seqIds = []  # List of seqId, startSample, endSample
-        self.active = True
-        self._transcript = None
-        self.recogniser = speakerRecogniser
-
-        self.speakerLock = TimeoutLock()
-        self.dataLock = TimeoutLock()
-        self.transcriptionLock = TimeoutLock()
-
-        self.transcriptFuture = None
-
-        self.start = startTime
-        self.end = None
-
-    def addFrame(self, seqId, timeStamp, src):
-        if src.id != self.srcId:
-            raise InvalidSrcException(
-                "Cannot attach frame from source stream {} to frames of source stream {}".format(src.id, self.srcId))
-        if not self.active:
-            raise SrcStreamEndedException("Cannot attach frame to ended source stream {}".format(self.srcId))
-
-        if src is None:
-            self.endStream(timeStamp)
-        else:
-            with self.dataLock:
-                self.seqIds.append(seqId)
-                self.data += src.wavedata
-
-    def endStream(self, timeStamp):
-        if not self.active:
-            raise SrcStreamEndedException("Stream {} has already been ended".format(self.srcId))
-        self.end = timeStamp
-        self.active = False
-        # End of data for this stream
-        rospy.loginfo("End of data for stream {} after {}s".format(self.srcId, self.duration))
-
-    def hasKnownSpeaker(self):
-        return self._speaker is not None
-
-    @property
-    def speaker(self):
-        return self.getSpeaker()
-
-    def getSpeaker(self, allowShortDuration=False, forceRetry=False):
-        with self.speakerLock:
-            if self._speaker is not None and not forceRetry:
-                return self._speaker
-
-            if not allowShortDuration and self.duration < MINDIARIZELENGTH:
-                raise SpeakerRecognitionError(
-                    "Stream {} is too short to recognise the speaker. {} < {}".format(self.srcId, self.duration,
-                                                                                      MINDIARIZELENGTH))
-
-            rospy.loginfo("Beginning speaker recognition for stream {}".format(self.srcId))
-
-            try:
-                with self.dataLock:
-                    audioData = self.getAudioData()
-                self._speaker = self.recogniser.predict(audioData)
-            except FeatureExtractionException as e:
-                rospy.logerr(e)
-                self._speaker = errorSpeaker
-            rospy.loginfo("Completed speaker recognition for stream {}".format(self.srcId))
-            return self._speaker
-
-    def getAudioData(self):
-        return AudioData(np.array(self.data, np.int16).tostring(), SAMPLERATE, 2)
-
-    def hasTranscription(self):
-        return self._transcript is not None
-
-    def doTranscription(self, forceRetry=False, async=False):
-        self.transcriptionLock.acquire()
-        if self._transcript is not None and not forceRetry:
-            self.transcriptionLock.release()
-            return self._transcript
-        else:
-            if self.active:
-                self.transcriptionLock.release()
-                raise SrcStreamStillActiveException(
-                    "Stream {} cannot be transcribed while it is still active".format(self.srcId))
-            if self.duration < MINTRANSCRIBELENGTH:
-                self.transcriptionLock.release()
-                raise TranscriptionError(
-                    "Stream {} is too short to transcribe {} < {}".format(self.srcId, self.duration,
-                                                                          MINTRANSCRIBELENGTH))
-
-            rospy.loginfo("Beginning transcription for stream {}".format(self.srcId))
-
-            with self.dataLock:
-                audioData = self.getAudioData()
-
-            transcript = self.rpcDispatcher.queueRequest({
-                'config': {
-                    'encoding': 'LINEAR16',  # raw 16-bit signed LE samples
-                    'sampleRate': audioData.sample_rate,  # 16 khz
-                    'languageCode': 'en-US',  # a BCP-47 language tag
-                },
-                'audio': {
-                    'content': base64.b64encode(audioData.get_raw_data()).decode('UTF-8')
-                }
-            })
-            self.transcriptFuture = transcript
-            if async:
-                return
-            return self.waitForTranscription()
-
-    def checkTranscription(self):
-        if self.transcriptFuture.done():
-            # This won't block anymore
-            return self.waitForTranscription()
-        return None
-
-    def waitForTranscription(self):
-        try:
-            rv = self.transcriptFuture.result(timeout=TIMEOUT)
-            if len(rv.get('results', [])) > 0 and len(rv['results'][0].get('alternatives', [])) > 0:
-                self._transcript = rv['results'][0]['alternatives'][0]['transcript']
-            else:
-                self._transcript = errorTranscript
-        except Exception as e:
-            if isinstance(e, TimeoutError):
-                rospy.logerr("Timed out waiting for result of transcription for stream {}".format(self.srcId))
-            else:
-                rospy.logerr("Error fetching transcript for stream {}: {}".format(self.srcId, e))
-            self._transcript = errorTranscript
-        self.transcriptionLock.release()
-        rospy.loginfo("Completed transcription for stream {}".format(self.srcId))
-        return self._transcript
-
-    @property
-    def transcription(self):
-        return self.doTranscription()
-
-    def __len__(self):
-        return self.length
-
-    @property
-    def length(self):
-        return len(self.data)
-
-    @property
-    def duration(self):
-        return self.length / float(self.sampleRate)
-
-    @property
-    def sentMessage(self):
-        return not self.active and self.hasKnownSpeaker() and self.hasTranscription()
+from config import (
+    SPEAKERMODEL,
+    MINTRANSCRIBELENGTH,
+    MINDIARIZELENGTH,
+    SAMPLERATE,
+
+)
+from rpc_dispatcher import RPCDispatcher
+from src_stream import SrcStream
 
 
 class Node(object):
@@ -466,15 +74,15 @@ class Node(object):
                 rospy.logdebug("Stream {} too short to process".format(stream.srcId))
             self.sendMessages(stream)
             rospy.logdebug("{} -> {}: {}".format(stream.srcId,
-                                                stream.speaker if stream.hasKnownSpeaker() else "<Unknown Speaker>",
-                                                stream.transcription if stream.hasTranscription() else "<Unknown Transcript>"))
+                                                 stream.speaker if stream.hasKnownSpeaker() else "<Unknown Speaker>",
+                                                 stream.transcription if stream.hasTranscription() else "<Unknown Transcript>"))
 
     def sendMessages(self, stream):
         if stream.hasTranscription() and stream.hasKnownSpeaker():
             # Send the final transcript message
             message = SentenceTranscription()
             message.header = std_msgs.msg.Header()
-            message.header.stamp=rospy.Time.now()
+            message.header.stamp = rospy.Time.now()
             message.sentence_id = 0  # TODO actually figure out what the sentence ids are
             message.stream_id = stream.srcId
             message.frame_ids = stream.seqIds
@@ -494,7 +102,7 @@ class Node(object):
             # Send the final transcript message
             message = Speaker()
             message.header = std_msgs.msg.Header()
-            message.header.stamp=rospy.Time.now()
+            message.header.stamp = rospy.Time.now()
             message.stream_id = stream.srcId
             message.frame_ids = stream.seqIds
             message.start = stream.start
@@ -535,7 +143,6 @@ class Node(object):
             except IOError:
                 rospy.logwarn("No model file '{}' found for existing speakers.".format(self.model))
                 rospy.logwarn("Please enroll people before starting detection")
-
         rospy.Subscriber("HarkSrcWave", HarkSrcWave, self.addToStreams)
 
         rospy.loginfo("Running")
