@@ -14,11 +14,3 @@ SPEAKERMODEL = "test_model.bin"
 
 DISCOVERY_URL = ('https://{api}.googleapis.com/$discovery/rest?'
                  'version={apiVersion}')
-
-
-class Actions():
-    enroll = 0
-    recognise = 1
-    starting = 2
-    closing = 3
-    loaded = 4

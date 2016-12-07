@@ -12,7 +12,7 @@ from custom_exceptions import (
     SpeakerRecognitionError,
     SrcStreamStillActiveException,
     TranscriptionError,
-)
+    EnrollmentError)
 from speech_recognition import AudioData
 
 import base64
@@ -47,11 +47,17 @@ errorTranscript = _ErrorTranscript()
 errorSpeaker = _ErrorSpeaker()
 
 
+class StreamType:
+    Unknown = 0
+    Enrollment = 1
+    Recognition = 2
+
+
 class SrcStream(object):
-    def __init__(self, srcId, sampleRate, rpcDispatcher, speakerRecogniser, startTime):
+    def __init__(self, srcId, sampleRate, rpcDispatcher, speakerRecogniser, startTime, streamType=StreamType.Recognition, speaker=None):
         self.rpcDispatcher = rpcDispatcher
         self.sampleRate = sampleRate
-        self._speaker = None
+        self._speaker = speaker
         self.srcId = srcId
         self.data = []
         self.seqIds = []  # List of seqId, startSample, endSample
@@ -67,6 +73,8 @@ class SrcStream(object):
 
         self.start = startTime
         self.end = None
+
+        self.type = streamType
 
     def addFrame(self, seqId, timeStamp, src):
         if src.id != self.srcId:
@@ -96,6 +104,10 @@ class SrcStream(object):
     @property
     def speaker(self):
         return self.getSpeaker()
+
+    @speaker.setter
+    def speaker(self, val):
+        self._speaker = val
 
     def getSpeaker(self, allowShortDuration=False, forceRetry=False):
         with self.speakerLock:
@@ -202,3 +214,22 @@ class SrcStream(object):
     @property
     def sentMessage(self):
         return not self.active and self.hasKnownSpeaker() and self.hasTranscription()
+
+    def enroll(self, allowShortDuration=False):
+        if self.active:
+            raise EnrollmentError("Stream {} cannot be enrolled while it is still active".format(self.srcId))
+
+        if not allowShortDuration and self.duration < MINDIARIZELENGTH:
+            raise EnrollmentError(
+                "Stream {} is too short to enroll the speaker. {} < {}".format(self.srcId, self.duration,
+                                                                                  MINDIARIZELENGTH))
+
+        rospy.loginfo("Beginning speaker enrollment for {}, stream {}".format(self._speaker, self.srcId))
+
+        try:
+            with self.dataLock:
+                audioData = self.getAudioData()
+            self.recogniser.enroll(audioData, self._speaker)
+        except FeatureExtractionException as e:
+            rospy.logerr(e)
+        rospy.loginfo("Completed speaker enrollment for {}, stream {}".format(self._speaker, self.srcId))

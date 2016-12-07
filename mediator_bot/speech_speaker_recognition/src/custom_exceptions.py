@@ -46,3 +46,6 @@ class RequestMethodError(RecogniserNodeException):
 class UnknownObjectError(Exception):
     pass
 
+
+class EnrollmentError(RecogniserNodeException):
+    pass
