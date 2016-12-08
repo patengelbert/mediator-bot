@@ -53,6 +53,7 @@ class Node(object):
 
         self.enrollName = None
         self._savedAction = None
+        self.numAdded = 0
 
     @property
     def action(self):
@@ -195,6 +196,7 @@ class Node(object):
             rospy.logerr("Cannot end enrollment when none is in process")
             return False
         self.checkEnrollStream()
+        self.numAdded += 1
         self.action = self._savedAction
         rospy.logdebug("Completed enrollment")
         return True
@@ -233,10 +235,10 @@ class Node(object):
             rate.sleep()
             if self.action == Actions.Recognise:
 
-                if firstLoop:
+                if firstLoop and self.numAdded >= 1:
                     # It crashes when in service
                     self.recogniser.train()
-                    firstLoop = False
+                firstLoop = False
 
                 self.checkStreams()
                 self.cleanStreams()
