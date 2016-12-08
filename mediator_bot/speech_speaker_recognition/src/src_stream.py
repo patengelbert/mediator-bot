@@ -76,6 +76,8 @@ class SrcStream(object):
 
         self.type = streamType
 
+        self.enrolled = False
+
     def addFrame(self, seqId, timeStamp, src):
         if src.id != self.srcId:
             raise InvalidSrcException(
@@ -218,18 +220,21 @@ class SrcStream(object):
     def enroll(self, allowShortDuration=False):
         if self.active:
             raise EnrollmentError("Stream {} cannot be enrolled while it is still active".format(self.srcId))
+        if self.enrolled:
+            raise EnrollmentError("Stream {} has already been enrolled".format(self.srcId))
 
         if not allowShortDuration and self.duration < MINDIARIZELENGTH:
             raise EnrollmentError(
                 "Stream {} is too short to enroll the speaker. {} < {}".format(self.srcId, self.duration,
                                                                                   MINDIARIZELENGTH))
 
-        rospy.loginfo("Beginning speaker enrollment for {}, stream {}".format(self._speaker, self.srcId))
+        rospy.logdebug("Beginning speaker enrollment for {}, stream {}".format(self._speaker, self.srcId))
 
         try:
             with self.dataLock:
                 audioData = self.getAudioData()
             self.recogniser.enroll(audioData, self._speaker)
+            self.enrolled = True
         except FeatureExtractionException as e:
             rospy.logerr(e)
         rospy.loginfo("Completed speaker enrollment for {}, stream {}".format(self._speaker, self.srcId))

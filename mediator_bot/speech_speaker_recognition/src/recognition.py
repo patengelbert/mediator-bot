@@ -99,7 +99,7 @@ class Node(object):
             streamsToCheck = [stream for stream in self.srcStreams.itervalues() if stream.type == StreamType.Enrollment]
 
             for stream in streamsToCheck:
-                if not stream.active:
+                if not stream.active and not stream.enrolled:
                     stream.enroll()
 
     def checkStreams(self):
@@ -173,7 +173,7 @@ class Node(object):
             # Clean up all enrollment streams if we are no longer in enroll mode
             notFinishedStreams = dict(
                 (streamId, stream) for streamId, stream in self.srcStreams.iteritems() if
-                not stream.sentMessage or (stream.type != StreamType.Recognition and self.action == Actions.Recognise))
+                not stream.sentMessage and stream.type == StreamType.Recognition and self.action == Actions.Recognise)
 
             if len(self.srcStreams) != len(notFinishedStreams):
                 cleanedIds = [str(streamId) for streamId in self.srcStreams.iterkeys() if
@@ -238,6 +238,7 @@ class Node(object):
                 if firstLoop and self.numAdded >= 1:
                     # It crashes when in service
                     self.recogniser.train()
+                    rospy.loginfo("Trained GMM for {} new speakers".format(self.numAdded))
                 firstLoop = False
 
                 self.checkStreams()
