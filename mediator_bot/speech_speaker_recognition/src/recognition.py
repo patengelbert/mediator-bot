@@ -5,8 +5,8 @@ import rospy
 import std_msgs.msg
 from hark_msgs.msg import HarkSrcWave
 from speaker_recognition import SpeakerRecognizer
-from speech_speaker_recognition.msg import SentenceTranscription, Speaker
-from speech_speaker_recognition.srv import StartEnrollment, EndEnrollment, StartRecognition
+from speech_speaker_recognition.msg import SentenceTranscription, Speaker, AddedUser
+from speech_speaker_recognition.srv import StartEnrollment, EndEnrollment, StartRecognition, SaveModel, LoadModel
 from config import (
     SPEAKERMODEL,
     MINTRANSCRIBELENGTH,
@@ -37,6 +37,10 @@ actionNames = {
 
 class Node(object):
     def __init__(self):
+        rospy.init_node('SpeakerSpeechNode')
+
+        rospy.loginfo("Initialising")
+
         self._action = Actions.Starting
         self.srcStreams = dict()
         self.activeStreams = set()
@@ -48,12 +52,24 @@ class Node(object):
         self.model = SPEAKERMODEL
         self.transcribingStreams = []
 
+        rospy.on_shutdown(self.rpcDispatcher.stop)
+
         self.transcriptionPublisher = rospy.Publisher('transcriptions', SentenceTranscription, queue_size=10)
         self.speakerPublisher = rospy.Publisher('speaker', Speaker, queue_size=10)
+        self.userAddedPublisher = rospy.Publisher("added_user", AddedUser, queue_size=10)
+
+        rospy.Subscriber("HarkSrcWave", HarkSrcWave, self.addToStreams)
+
+        rospy.Service('StartEnrollment', StartEnrollment, self.enroll)
+        rospy.Service('EndEnrollment', EndEnrollment, self.endEnroll)
+        rospy.Service('StartRecognition', StartRecognition, self.startRecognition)
+        rospy.Service('SaveModel', SaveModel, self.saveModel)
+        rospy.Service('LoadModel', LoadModel, self.loadModel)
 
         self.enrollName = None
         self._savedAction = None
         self.numAdded = 0
+        self.trained = True
 
     @property
     def action(self):
@@ -99,7 +115,7 @@ class Node(object):
             streamsToCheck = [stream for stream in self.srcStreams.itervalues() if stream.type == StreamType.Enrollment]
 
             for stream in streamsToCheck:
-                if not stream.active and not stream.enrolled:
+                if not stream.active and not stream.enrolled and stream.duration > MINDIARIZELENGTH:
                     stream.enroll()
 
     def checkStreams(self):
@@ -147,7 +163,6 @@ class Node(object):
         elif stream.hasKnownSpeaker():
             publisher = self.speakerPublisher
             # Send intermediate message
-            # Send the final transcript message
             message = Speaker()
             message.header = std_msgs.msg.Header()
             message.header.stamp = rospy.Time.now()
@@ -155,7 +170,7 @@ class Node(object):
             message.frame_ids = stream.seqIds
             message.start = stream.start
             message.end = stream.end if stream.end is not None else stream.start
-            message.active = stream.end is not None
+            message.active = stream.end is None
             message.duration = stream.duration
             message.speaker = stream.speaker
         if publisher is not None:
@@ -198,7 +213,9 @@ class Node(object):
         self.checkEnrollStream()
         self.numAdded += 1
         self.action = self._savedAction
-        rospy.logdebug("Completed enrollment")
+        self.trained = False
+        self.sendParticipantMessage(self.enrollName)
+        rospy.loginfo("Completed enrollment of {}".format(self.enrollName))
         return True
 
     def startRecognition(self, req):
@@ -207,24 +224,40 @@ class Node(object):
         rospy.loginfo("Running")
         return True
 
+    def saveModel(self, req):
+        rospy.logdebug("Attempting to save model as {}".format(req.name))
+        if len(self.recogniser.features) == 0:
+            rospy.logerr("Cannot save model with not enrolled people")
+            return False
+        if not self.trained:
+            rospy.logerr("Cannot save an untrained model")
+            return False
+        self.recogniser.dump(req.name)
+        rospy.loginfo("Save model as {}".format(req.name))
+        return True
+
+    def loadModel(self, req):
+        rospy.logdebug("Attempting to save model as {}".format(req.name))
+        self.recogniser = SpeakerRecognizer.load(req.name)
+
+        for name in self.recogniser.features.iterkeys():
+            self.sendParticipantMessage(name)
+
+        rospy.loginfo("Loaded model {}".format(req.name))
+        return True
+
+    def sendParticipantMessage(self, name):
+        msg = AddedUser()
+        msg.header = std_msgs.msg.Header()
+        msg.header.stamp = rospy.Time.now()
+        msg.name = name
+        self.userAddedPublisher.publish(msg)
+
     def start(self):
         self.rpcDispatcher.start()
-        rospy.init_node('SpeakerSpeechNode')
-        rospy.on_shutdown(self.rpcDispatcher.stop)
 
-        if self.model is not None:
-            try:
-                self.recogniser = SpeakerRecognizer.load(self.model)
-                rospy.loginfo("Loaded speaker model {}".format(self.model))
-            except IOError:
-                rospy.logwarn("No model file '{}' found for existing speakers.".format(self.model))
-                rospy.logwarn("Please enroll people before starting detection")
-
-        rospy.Subscriber("HarkSrcWave", HarkSrcWave, self.addToStreams)
-
-        rospy.Service('StartEnrollment', StartEnrollment, self.enroll)
-        rospy.Service('EndEnrollment', EndEnrollment, self.endEnroll)
-        rospy.Service('StartRecognition', StartRecognition, self.startRecognition)
+        if len(self.recogniser.features) == 0:
+            rospy.logwarn("Please enroll people before starting detection")
 
         rospy.loginfo("Starting")
 
@@ -238,6 +271,7 @@ class Node(object):
                 if firstLoop and self.numAdded >= 1:
                     # It crashes when in service
                     self.recogniser.train()
+                    self.trained = True
                     rospy.loginfo("Trained GMM for {} new speakers".format(self.numAdded))
                 firstLoop = False
 

@@ -49,6 +49,7 @@ add_message_files(
   FILES
   SentenceTranscription.msg
   Speaker.msg
+  AddedUser.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -57,6 +58,8 @@ add_service_files(
   StartEnrollment.srv
   EndEnrollment.srv
   StartRecognition.srv
+  LoadModel.srv
+  SaveModel.srv
 )
 
 ## Generate actions in the 'action' folder
