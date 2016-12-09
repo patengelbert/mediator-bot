@@ -108,11 +108,11 @@ class Node(object):
                     if streamId not in self.srcStreams.keys():
                         streamType = StreamType.Enrollment if self.action == Actions.Enroll else StreamType.Recognition
                         self.srcStreams[streamId] = SrcStream(streamId, SAMPLERATE, self.rpcDispatcher, self.recogniser,
-                                                              data.header.stamp, streamType=streamType,
+                                                              rospy.Time.now(), streamType=streamType,
                                                               speaker=self.enrollName if streamType == StreamType.Enrollment else None)
                         self.activeStreams.add(streamId)
 
-                    self.srcStreams[streamId].addFrame(data.header.seq, data.header.stamp, srcStream)
+                    self.srcStreams[streamId].addFrame(data.header.seq, rospy.Time.now(), srcStream)
                     updatedStreams.add(streamId)
 
                 for streamId in [sid for sid in self.activeStreams if sid not in updatedStreams]:
@@ -155,12 +155,13 @@ class Node(object):
     def sendMessages(self, stream):
         publisher = None
         message = None
+        tNow = rospy.Time.now()
         if stream.hasTranscription() and stream.hasKnownSpeaker():
             publisher = self.transcriptionPublisher
             # Send the final transcript message
             message = SentenceTranscription()
             message.header = std_msgs.msg.Header()
-            message.header.stamp = rospy.Time.now()
+            message.header.stamp = tNow
             message.sentence_id = 0  # TODO actually figure out what the sentence ids are
             message.stream_id = stream.srcId
             message.frame_ids = stream.seqIds
@@ -174,7 +175,7 @@ class Node(object):
             # Send intermediate message
             message = Speaker()
             message.header = std_msgs.msg.Header()
-            message.header.stamp = rospy.Time.now()
+            message.header.stamp = tNow
             message.stream_id = stream.srcId
             message.frame_ids = stream.seqIds
             message.start = stream.start
@@ -182,6 +183,8 @@ class Node(object):
             message.active = stream.end is None
             message.duration = stream.duration
             message.speaker = stream.speaker
+            message.since_last_update = tNow - stream.lastUpdate
+            stream.lastUpdate = tNow
         if publisher is not None:
             try:
                 rospy.logdebug("Sending ros topic\n'{}'".format(str(message)))

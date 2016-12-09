@@ -74,6 +74,8 @@ class SrcStream(object):
         self.start = startTime
         self.end = None
 
+        self.lastUpdate = startTime
+
         self.type = streamType
 
         self.enrolled = False

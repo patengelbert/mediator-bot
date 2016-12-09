@@ -6,3 +6,4 @@ time end
 bool active
 float64 duration
 string speaker
+time since_last_update
