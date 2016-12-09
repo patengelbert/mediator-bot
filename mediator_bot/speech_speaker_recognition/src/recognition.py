@@ -172,7 +172,7 @@ class Node(object):
             message.end = stream.end
             message.duration = stream.duration
             message.speaker = stream.speaker
-            message.sentence = stream.transcription
+            message.sentence = str(stream.transcription)
         elif stream.hasKnownSpeaker():
             publisher = self.speakerPublisher
             # Send intermediate message

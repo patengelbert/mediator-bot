@@ -4,6 +4,6 @@ uint32 stream_id
 uint32[] frame_ids
 time start
 time end
-uint64 duration
+float64 duration
 string speaker
 string sentence
