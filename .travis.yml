@@ -62,8 +62,8 @@ before_install:
    -sudo apt-get install -y python-catkin-pkg python-rosdep python-wstool ros-$(ROS_DISTRO)-catkin python-rosinstall ros-$(ROS_DISTRO)-smach ros-$(ROS_DISTRO)-smach-viewer
 # Prepare rosdep to install dependencies.
   - sudo rm -f /etc/ros/rosdep/sources.list.d/20-default.list
-  -	sudo rosdep init
-  -	rosdep update
+  - sudo rosdep init
+  - rosdep update
 
 # Install conda
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
