@@ -41,8 +41,8 @@ def addHeader(msg):
 
 
 class Node(object):
-    def __init__(self, modelFile=None):
-        rospy.init_node('SpeakerSpeechNode')
+    def __init__(self, modelFile=None, debugLevel=rospy.INFO):
+        rospy.init_node('SpeakerSpeechNode', log_level=debugLevel)
 
         rospy.loginfo("Initialising")
 
@@ -76,11 +76,7 @@ class Node(object):
         self.trained = True
 
         if modelFile is not None:
-            try:
-                self.recogniser = SpeakerRecognizer.load(modelFile)
-                rospy.loginfo("Loaded speaker model file '{}' with {} features".format(modelFile, len(self.recogniser.features)))
-            except IOError:
-                rospy.logerr("No model file '{}' found for existing speakers.".format(modelFile))
+            self._loadModel(modelFile)
 
         if len(self.recogniser.features) == 0:
             rospy.logwarn("Please enroll people before starting detection")
@@ -262,14 +258,24 @@ class Node(object):
             rospy.logerr("Saving and loading models is currently not supported")
             return False
 
-        rospy.logdebug("Attempting to load model as {}".format(req.name))
-        self.recogniser = SpeakerRecognizer.load(req.name)
+        return self._loadModel(req.name)
 
-        for name in self.recogniser.features.iterkeys():
-            self.sendParticipantMessage(name)
+    def _loadModel(self, name):
 
-        rospy.loginfo("Loaded model {}".format(req.name))
-        rospy.loginfo("Found {} people".format(len(self.recogniser.features)))
+        rospy.logdebug("Attempting to load model as {}".format(name))
+        try:
+            self.recogniser = SpeakerRecognizer.load(name)
+            rospy.loginfo(
+                "Loaded speaker model file '{}' with {} features".format(name, len(self.recogniser.features)))
+        except IOError:
+            rospy.logerr("No model file '{}' found for existing speakers.".format(name))
+            return False
+
+        for p in self.recogniser.features.iterkeys():
+            self.sendParticipantMessage(p)
+
+        rospy.loginfo("Loaded model {}".format(name))
+
         return True
 
     def sendParticipantMessage(self, name):
