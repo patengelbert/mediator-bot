@@ -35,6 +35,11 @@ actionNames = {
 }
 
 
+def addHeader(msg):
+    msg.header = std_msgs.msg.Header()
+    msg.header.stamp = rospy.Time.now()
+
+
 class Node(object):
     def __init__(self, modelFile=None):
         rospy.init_node('SpeakerSpeechNode')
@@ -160,8 +165,6 @@ class Node(object):
             publisher = self.transcriptionPublisher
             # Send the final transcript message
             message = SentenceTranscription()
-            message.header = std_msgs.msg.Header()
-            message.header.stamp = tNow
             message.sentence_id = 0  # TODO actually figure out what the sentence ids are
             message.stream_id = stream.srcId
             message.frame_ids = stream.seqIds
@@ -174,8 +177,6 @@ class Node(object):
             publisher = self.speakerPublisher
             # Send intermediate message
             message = Speaker()
-            message.header = std_msgs.msg.Header()
-            message.header.stamp = tNow
             message.stream_id = stream.srcId
             message.frame_ids = stream.seqIds
             message.start = stream.start
@@ -185,7 +186,9 @@ class Node(object):
             message.speaker = stream.speaker
             message.since_last_update = tNow - stream.lastUpdate
             stream.lastUpdate = tNow
+
         if publisher is not None:
+            addHeader(message)
             try:
                 rospy.logdebug("Sending ros topic\n'{}'".format(str(message)))
                 publisher.publish(message)
@@ -271,8 +274,7 @@ class Node(object):
 
     def sendParticipantMessage(self, name):
         msg = AddedUser()
-        msg.header = std_msgs.msg.Header()
-        msg.header.stamp = rospy.Time.now()
+        addHeader(msg)
         msg.name = name
         self.userAddedPublisher.publish(msg)
 
