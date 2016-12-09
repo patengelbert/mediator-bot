@@ -56,14 +56,66 @@ cache:
 ################################################################################
 
 before_install:
-  - make install-ros
+  - sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $(ROS_CI_DESKTOP) main\" > /etc/apt/sources.list.d/ros-latest.list"
+  - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+  - sudo apt-get update -qq
+   -sudo apt-get install -y python-catkin-pkg python-rosdep python-wstool ros-$(ROS_DISTRO)-catkin python-rosinstall ros-$(ROS_DISTRO)-smach ros-$(ROS_DISTRO)-smach-viewer
+# Prepare rosdep to install dependencies.
+  - sudo rm -f /etc/ros/rosdep/sources.list.d/20-default.list
+  -	sudo rosdep init
+  -	rosdep update
+
+# Install conda
+  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda update --yes conda
+  # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
+  - sudo rm -rf /dev/shm
+  - sudo ln -s /run/shm /dev/shm
 
 install:
-  - make setup-build
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy
+  - python setup.py install
 
-before_script:
-  - make install-dependencies
+  - mkdir -p build/src
+  - mkdir -p build/build
+  - ln -s env build/build/catkin_pip_env
+
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libboost-all-dev libblitz0-dev libopenblas-dev liblapack-dev gfortran
+  - pip install --upgrade -r bob-requirements.txt
+  - pip install --upgrade bob.extension==2.3.4
+  - pip install --upgrade bob.blitz==2.0.11
+  - pip install --upgrade bob.core==2.1.6
+  - pip install --upgrade bob.sp==2.0.7
+  - pip install --upgrade bob.ap==2.1.1
+  - pip install --upgrade  -r requirements.txt
+  - pip install --upgrade -e git+https://github.com/patengelbert/speaker-recognition.git@b4ec098a928f2197076f7e1063a58ad5b2926cb7#egg=SpeakerRecognition
+  - source /opt/ros/indigo/setup.sh
+  - catkin_init_workspace build/src
+  - cd build
+  - catkin_make -C build
+# Add the project to the workspace using a symlink.
+  - ln -s mediator_bot build/src
+
+  - rm -f build/src/.rosinstall*
+# package depdencies: install using rosdep.
+  - source /opt/ros/indigo/setup.sh
+  - source build/devel/setup.sh
+  - wstool init build/src
+  - if [ -f mediator_bot/dependencies.rosinstall ] ; then wstool merge -t buiild/src mediator_bot/dependencies.rosinstall ; fi
+  - wstool up
+  - rosdep install -y --from-paths src --ignore-src --rosdistro indigo --os ubuntu:trusty
+
+  - ln -s env build/build/catkin_pip_env
+  - source build/devel/setup.sh
+  - catkin_make -C build $( [ -f mediator_bot/catkin.options ] && cat mediator_bot/catkin.options )
 
 script:
-  - make build
-  - make test
+  - source /opt/ros/indigo/setup.sh
+  - source env/bin/activate
+  - source build/devel/setup.sh
+  - catkin_make -C build run_tests
+  - catkin_test_results build
