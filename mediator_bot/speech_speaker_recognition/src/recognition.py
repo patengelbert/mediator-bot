@@ -58,9 +58,11 @@ class Node(object):
 
         rospy.on_shutdown(self.rpcDispatcher.stop)
 
+        rospy.logdebug("Creating Publishers/Subscribers")
+
         self.transcriptionPublisher = rospy.Publisher('transcriptions', SentenceTranscription, queue_size=10)
         self.speakerPublisher = rospy.Publisher('speaker', Speaker, queue_size=10)
-        self.userAddedPublisher = rospy.Publisher("added_user", AddedUser, queue_size=10)
+        self.userAddedPublisher = rospy.Publisher("added_user", AddedUser, queue_size=4, latch=True)
 
         rospy.Subscriber("HarkSrcWave", HarkSrcWave, self.addToStreams)
 
@@ -75,11 +77,19 @@ class Node(object):
         self.numAdded = 0
         self.trained = True
 
+        rospy.logdebug("Waiting for subscribers to be set up")
+        rospy.sleep(3)
+
+        # TODO it send messages to soon here
         if modelFile is not None:
+            # Wat for subscribers to have set up
+            rospy.logdebug("Loading model file")
             self._loadModel(modelFile)
 
         if len(self.recogniser.features) == 0:
             rospy.logwarn("Please enroll people before starting detection")
+
+        rospy.logdebug("Finished initialisation")
 
     @property
     def action(self):
@@ -274,11 +284,12 @@ class Node(object):
         for p in self.recogniser.features.iterkeys():
             self.sendParticipantMessage(p)
 
-        rospy.loginfo("Loaded model {}".format(name))
+        rospy.loginfo("Completed loading model file '{}'".format(name))
 
         return True
 
     def sendParticipantMessage(self, name):
+        rospy.logdebug("Sending participant message {}".format(name))
         msg = AddedUser()
         addHeader(msg)
         msg.name = name
@@ -302,7 +313,7 @@ class Node(object):
 
 
 if __name__ == '__main__':
-    node = Node(modelFile=SPEAKERMODEL)
+    node = Node(modelFile=SPEAKERMODEL, debugLevel=rospy.INFO)
     try:
         node.start()
     except rospy.ROSInterruptException:
