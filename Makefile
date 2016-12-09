@@ -53,7 +53,8 @@ setup-build: setup-env
 	( \
 	. $(BUILD_DIR)/build/catkin_pip_env/bin/activate ; \
 	sudo apt-get update -qq ; \
-	sudo apt-get install -y libboost-all-dev libblitz0-dev libopenblas-dev ; \
+	sudo apt-get install -y libboost-all-dev libblitz0-dev libopenblas-dev liblapack-dev gfortran; \
+	pip install --upgrade numpy==1.11.2 ; \
 	pip install --upgrade -r bob-requirements.txt ; \
 	pip install --upgrade bob.extension==2.3.4 ; \
 	pip install --upgrade bob.blitz==2.0.11 ; \
