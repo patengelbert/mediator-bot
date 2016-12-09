@@ -12,7 +12,7 @@ from config import (
     MINTRANSCRIBELENGTH,
     MINDIARIZELENGTH,
     SAMPLERATE,
-
+    SAVELOADEVENTSUPPORTED,
 )
 from rpc_dispatcher import RPCDispatcher
 from src_stream import SrcStream, StreamType
@@ -36,7 +36,7 @@ actionNames = {
 
 
 class Node(object):
-    def __init__(self):
+    def __init__(self, modelFile=None):
         rospy.init_node('SpeakerSpeechNode')
 
         rospy.loginfo("Initialising")
@@ -49,7 +49,6 @@ class Node(object):
 
         self.rpcDispatcher = RPCDispatcher()
         self.recogniser = SpeakerRecognizer()
-        self.model = SPEAKERMODEL
         self.transcribingStreams = []
 
         rospy.on_shutdown(self.rpcDispatcher.stop)
@@ -70,6 +69,16 @@ class Node(object):
         self._savedAction = None
         self.numAdded = 0
         self.trained = True
+
+        if modelFile is not None:
+            try:
+                self.recogniser = SpeakerRecognizer.load(modelFile)
+                rospy.loginfo("Loaded speaker model file '{}' with {} features".format(modelFile, len(self.recogniser.features)))
+            except IOError:
+                rospy.logerr("No model file '{}' found for existing speakers.".format(modelFile))
+
+        if len(self.recogniser.features) == 0:
+            rospy.logwarn("Please enroll people before starting detection")
 
     @property
     def action(self):
@@ -225,6 +234,11 @@ class Node(object):
         return True
 
     def saveModel(self, req):
+
+        if not SAVELOADEVENTSUPPORTED:
+            rospy.logerr("Saving and loading models is currently not supported")
+            return False
+
         rospy.logdebug("Attempting to save model as {}".format(req.name))
         if len(self.recogniser.features) == 0:
             rospy.logerr("Cannot save model with not enrolled people")
@@ -237,13 +251,19 @@ class Node(object):
         return True
 
     def loadModel(self, req):
-        rospy.logdebug("Attempting to save model as {}".format(req.name))
+
+        if not SAVELOADEVENTSUPPORTED:
+            rospy.logerr("Saving and loading models is currently not supported")
+            return False
+
+        rospy.logdebug("Attempting to load model as {}".format(req.name))
         self.recogniser = SpeakerRecognizer.load(req.name)
 
         for name in self.recogniser.features.iterkeys():
             self.sendParticipantMessage(name)
 
         rospy.loginfo("Loaded model {}".format(req.name))
+        rospy.loginfo("Found {} people".format(len(self.recogniser.features)))
         return True
 
     def sendParticipantMessage(self, name):
@@ -256,33 +276,22 @@ class Node(object):
     def start(self):
         self.rpcDispatcher.start()
 
-        if len(self.recogniser.features) == 0:
-            rospy.logwarn("Please enroll people before starting detection")
-
         rospy.loginfo("Starting")
 
         rate = rospy.Rate(1)
 
-        firstLoop = True
         while not rospy.is_shutdown():
             rate.sleep()
             if self.action == Actions.Recognise:
-
-                if firstLoop and self.numAdded >= 1:
-                    # It crashes when in service
-                    self.recogniser.train()
-                    self.trained = True
-                    rospy.loginfo("Trained GMM for {} new speakers".format(self.numAdded))
-                firstLoop = False
-
                 self.checkStreams()
                 self.cleanStreams()
+
             elif self.action == Actions.Enroll:
                 self.checkEnrollStream()
 
 
 if __name__ == '__main__':
-    node = Node()
+    node = Node(modelFile=SPEAKERMODEL)
     try:
         node.start()
     except rospy.ROSInterruptException:
