@@ -1,5 +1,5 @@
 Header header
-uint32 sentence_id
+int64 sentence_id
 uint32 stream_id
 uint32[] frame_ids
 time start

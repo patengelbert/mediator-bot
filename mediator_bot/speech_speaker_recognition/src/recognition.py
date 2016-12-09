@@ -165,7 +165,7 @@ class Node(object):
             publisher = self.transcriptionPublisher
             # Send the final transcript message
             message = SentenceTranscription()
-            message.sentence_id = 0  # TODO actually figure out what the sentence ids are
+            message.sentence_id = stream.sentenceId
             message.stream_id = stream.srcId
             message.frame_ids = stream.seqIds
             message.start = stream.start

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import itertools
 import numpy as np
 import rospy
 from concurrent.futures import TimeoutError
@@ -53,7 +53,11 @@ class StreamType:
     Recognition = 2
 
 
+
 class SrcStream(object):
+
+    newId = itertools.count().next
+
     def __init__(self, srcId, sampleRate, rpcDispatcher, speakerRecogniser, startTime, streamType=StreamType.Recognition, speaker=None):
         self.rpcDispatcher = rpcDispatcher
         self.sampleRate = sampleRate
@@ -64,6 +68,7 @@ class SrcStream(object):
         self.active = True
         self._transcript = None
         self.recogniser = speakerRecogniser
+        self.sentenceId = None
 
         self.speakerLock = TimeoutLock()
         self.dataLock = TimeoutLock()
@@ -158,6 +163,7 @@ class SrcStream(object):
                                                                           MINTRANSCRIBELENGTH))
 
             rospy.loginfo("Beginning transcription for stream {}".format(self.srcId))
+            self.sentenceId = SrcStream.newId()
 
             with self.dataLock:
                 audioData = self.getAudioData()
