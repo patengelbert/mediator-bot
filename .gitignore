@@ -94,6 +94,7 @@ env/
 
 # Vim files
 *.swp
+*.swo
 
 #ROS files
 /.rosinstall
@@ -106,3 +107,7 @@ env/
 *.wav
 *.raw
 *.mpeg
+
+#Temporary Files
+*~
+~*
