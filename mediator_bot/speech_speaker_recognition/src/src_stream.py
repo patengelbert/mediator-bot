@@ -3,6 +3,7 @@ import itertools
 import numpy as np
 import rospy
 from concurrent.futures import TimeoutError
+from enum import Enum
 from speaker_recognition.exceptions import FeatureExtractionException
 
 from custom_exceptions import (
@@ -47,18 +48,18 @@ errorTranscript = _ErrorTranscript()
 errorSpeaker = _ErrorSpeaker()
 
 
-class StreamType:
-    Unknown = 0
-    Enrollment = 1
-    Recognition = 2
-
+class StreamType(Enum):
+    UNKNOWN = 0
+    ENROLLMENT = 1
+    RECOGNITION = 2
 
 
 class SrcStream(object):
 
     newId = itertools.count().next
 
-    def __init__(self, srcId, sampleRate, rpcDispatcher, speakerRecogniser, startTime, streamType=StreamType.Recognition, speaker=None):
+    def __init__(self, srcId, sampleRate, rpcDispatcher, speakerRecogniser, startTime,
+                 streamType=StreamType.RECOGNITION, speaker=None):
         self.rpcDispatcher = rpcDispatcher
         self.sampleRate = sampleRate
         self._speaker = speaker

@@ -117,10 +117,10 @@ class Node(object):
                 for srcStream in data.src:
                     streamId = srcStream.id
                     if streamId not in self.srcStreams.keys():
-                        streamType = StreamType.Enrollment if self.action == Actions.Enroll else StreamType.Recognition
+                        streamType = StreamType.ENROLLMENT if self.action == Actions.Enroll else StreamType.RECOGNITION
                         self.srcStreams[streamId] = SrcStream(streamId, SAMPLERATE, self.rpcDispatcher, self.recogniser,
                                                               rospy.Time.now(), streamType=streamType,
-                                                              speaker=self.enrollName if streamType == StreamType.Enrollment else None)
+                                                              speaker=self.enrollName if streamType == StreamType.ENROLLMENT else None)
                         self.activeStreams.add(streamId)
 
                     self.srcStreams[streamId].addFrame(data.header.seq, rospy.Time.now(), srcStream)
@@ -132,7 +132,7 @@ class Node(object):
 
     def checkEnrollStream(self):
         with self.streamLock:
-            streamsToCheck = [stream for stream in self.srcStreams.itervalues() if stream.type == StreamType.Enrollment]
+            streamsToCheck = [stream for stream in self.srcStreams.itervalues() if stream.type == StreamType.ENROLLMENT]
 
             for stream in streamsToCheck:
                 if not stream.active and not stream.enrolled and stream.duration > MINDIARIZELENGTH:
@@ -141,7 +141,7 @@ class Node(object):
     def checkStreams(self):
         with self.streamLock:
             streamsToCheck = [stream for stream in self.srcStreams.itervalues() if
-                              stream.type == StreamType.Recognition and
+                              stream.type == StreamType.RECOGNITION and
                               (not stream.hasKnownSpeaker() or not stream.hasTranscription())]
         for stream in streamsToCheck:
             doTranscription = not stream.active and stream.duration > MINTRANSCRIBELENGTH and not stream.hasTranscription()
@@ -209,7 +209,7 @@ class Node(object):
             # Clean up all enrollment streams if we are no longer in enroll mode
             notFinishedStreams = dict(
                 (streamId, stream) for streamId, stream in self.srcStreams.iteritems() if
-                not stream.sentMessage and stream.type == StreamType.Recognition and self.action == Actions.Recognise)
+                not stream.sentMessage and stream.type == StreamType.RECOGNITION and self.action == Actions.Recognise)
 
             if len(self.srcStreams) != len(notFinishedStreams):
                 cleanedIds = [str(streamId) for streamId in self.srcStreams.iterkeys() if
