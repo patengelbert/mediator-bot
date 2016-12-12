@@ -24,8 +24,8 @@ responseMultipleList = [1]
 
 
 class ResponseServer:
-    def __init__(self):
-        rospy.init_node('response_server', log_level=rospy.DEBUG)
+    def __init__(self, debugLevel=rospy.INFO):
+        rospy.init_node('response_server', log_level=debugLevel)
         rospy.on_shutdown(self.shutdown)
         # Initialise and start the action server
         self.server = actionlib.SimpleActionServer('response', responseAction, self.execute, False)
