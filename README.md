@@ -55,6 +55,7 @@ git stash pop
 ## Reports
 
 [Design Report](https://www.overleaf.com/6835404kgznhmrnwdwq)
+[Final Report](https://www.overleaf.com/7427603bmmydhjfsxxn)
 
 ## System
 
