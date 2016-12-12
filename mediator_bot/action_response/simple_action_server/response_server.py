@@ -136,12 +136,15 @@ class ResponseServer:
             chosen = random.choice(self.resStartMonitor)
             if chosen is 1:
                 # print "share ", goal.name, ", ", goal.direction
+                self.tts.say(goal.name)
                 self.bm.runBehavior("reponses-c397b4/Share")
             if chosen is 2:
                 # print "your turn ", goal.name, ", ", goal.direction
+                self.tts.say(goal.name)
                 self.bm.runBehavior("reponses-c397b4/Your_turn")
             if chosen is 3:
                 # print "your views ", goal.name, ", ", goal.direction
+                self.tts.say(goal.name)
                 self.bm.runBehavior("reponses-c397b4/Your_views")
             self.resStartMonitor.remove(chosen)
             self.bm.runBehavior("actions-67d9a5/Return")
