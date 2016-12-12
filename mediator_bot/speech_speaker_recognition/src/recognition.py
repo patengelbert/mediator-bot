@@ -3,6 +3,7 @@ import threading
 
 import rospy
 import std_msgs.msg
+from enum import Enum
 from hark_msgs.msg import HarkSrcWave
 from speaker_recognition import SpeakerRecognizer
 from speech_speaker_recognition.msg import SentenceTranscription, Speaker, AddedUser
@@ -18,21 +19,12 @@ from rpc_dispatcher import RPCDispatcher
 from src_stream import SrcStream, StreamType
 
 
-class Actions:
+class Actions(Enum):
     Unknown = 0
     Recognise = 1
     Enroll = 2
     Starting = 3
     Stopping = 4
-
-
-actionNames = {
-    Actions.Unknown: "Unknown",
-    Actions.Recognise: "Recognise",
-    Actions.Enroll: "Enroll",
-    Actions.Starting: "Starting",
-    Actions.Stopping: "Stopping",
-}
 
 
 def addHeader(msg):
@@ -99,7 +91,7 @@ class Node(object):
     @action.setter
     def action(self, val):
         with self.actionLock:
-            rospy.loginfo("Changing mode to {}".format(actionNames[val]))
+            rospy.loginfo("Changing mode to {}".format(val.name))
             self._action = val
 
     def addToStreams(self, data):
