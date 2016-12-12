@@ -12,67 +12,67 @@ if __name__ == '__main__':
     client = actionlib.SimpleActionClient('response', responseAction)
     client.wait_for_server()
 
-    goal = responseGoal(action="stop", name="Matthew", direction=0)
+    goal = responseGoal(keywords=["stop"], name="Matthew", direction=0)
     # Fill in the goal here
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="stop", name="Mark", direction=45)
+    goal = responseGoal(keywords=["stop"], name="Mark", direction=45)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="start", name="Luke", direction=90)
+    goal = responseGoal(keywords=["start"], name="Luke", direction=90)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="start", name="John", direction=-45)
+    goal = responseGoal(keywords=["start"], name="John", direction=-45)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="start", name="Matthew", direction=-90)
+    goal = responseGoal(keywords=["start"], name="Matthew", direction=-90)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="start", name="Mark", direction=0)
+    goal = responseGoal(keywords=["start"], name="Mark", direction=0)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="loud", name="Luke", direction=45)
+    goal = responseGoal(keywords=["loud"], name="Luke", direction=45)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="loud", name="John", direction=90)
+    goal = responseGoal(keywords=["loud"], name="John", direction=90)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="loud", name="Matthew", direction=-45)
+    goal = responseGoal(keywords=["loud"], name="Matthew", direction=-45)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="loud", name="Mark", direction=-90)
+    goal = responseGoal(keywords=["loud"], name="Mark", direction=-90)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="multiple", name="Luke", direction=0)
+    goal = responseGoal(keywords=["multiple"], name="Luke", direction=0)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="multiple", name="John", direction=45)
+    goal = responseGoal(keywords=["multiple"], name="John", direction=45)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="natural", direction=-30)
+    goal = responseGoal(keywords=["natural"], direction=-30)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="start", name="Mark", direction=45)
+    goal = responseGoal(keywords="start", name="Mark", direction=45)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="multiple")
+    goal = responseGoal(keywords=["multiple"])
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(action="loud")
+    goal = responseGoal(keywords=["loud"])
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))

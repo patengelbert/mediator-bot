@@ -1,17 +1,12 @@
 #! /usr/bin/env python
 
-import rospy
-from naoqi import ALProxy
-
-robotIP = "127.0.0.1"
-robotPort = 57373
-
-
 class YouLeft:
-    def __init__(self, angle):
+    def __init__(self, angle, movementProxy):
         self.names = list()
         self.times = list()
         self.keys = list()
+
+        self.movementProxy = movementProxy
 
         self.names.append("LElbowRoll")
         self.times.append([0.04, 0.6, 1.56])
@@ -79,15 +74,5 @@ class YouLeft:
             [[0.100401, [3, -0.0133333, 0], [3, 0.186667, 0]], [0.0994838, [3, -0.186667, 0], [3, 0.32, 0]],
              [0.0994838, [3, -0.32, 0], [3, 0, 0]]])
 
-    def run(self, IP, Port):
-        try:
-            motion = ALProxy("ALMotion", IP, Port)
-            motion.angleInterpolationBezier(self.names, self.times, self.keys)
-        except Exception as err:
-            rospy.logerr(err)
-            raise
-
-
-if __name__ == "__main__":
-    yl = YouLeft(45)
-    yl.run(robotIP, robotPort)
+    def run(self):
+        self.movementProxy.angleInterpolationBezier(self.names, self.times, self.keys)
