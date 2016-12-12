@@ -3,6 +3,13 @@
 import rospy
 import actionlib
 import random
+
+import pointLeft
+import pointRight
+import stopLeft
+import stopRight
+import youLeft
+import youRight
 from naoqi import ALProxy
 
 from action_response.msg import responseAction
@@ -71,15 +78,22 @@ class ResponseServer:
                 self.stopMonitor = actionStopList[:]
             chosen = random.choice(self.stopMonitor)
             if chosen is 1:
-                print "stop ", goal.name, ", ", goal.direction
-                self.bm.runBehavior("actions-67d9a5/Stop")
+                #print "stop ", goal.name, ", ", goal.direction
+                direction = math.radians(goal.direction)
+                self.m.setAngles("HeadYaw", direction, 0.3)
+                if direction < 0:
+                    stop = stopRight.StopRight(direction)
+                else:
+                    stop = stopLeft.StopLeft(diretion)
+                stop.run()
+                #self.bm.runBehavior("actions-67d9a5/Stop")
             self.stopMonitor.remove(chosen)
             # Select response to run
             if not self.resStopMonitor:
                 self.resStopMonitor = responseStopList[:]
             chosen = random.choice(self.resStopMonitor)
             if chosen is 1:
-                print "someone else ", goal.name, ", ", goal.direction
+                #print "someone else ", goal.name, ", ", goal.direction
                 self.bm.runBehavior("reponses-c397b4/Someone_else")
             self.resStopMonitor.remove(chosen)
             self.bm.runBehavior("actions-67d9a5/Return")
@@ -91,27 +105,43 @@ class ResponseServer:
                 self.startMonitor = actionStartList[:]
             chosen = random.choice(self.startMonitor)
             if chosen is 1:
-                print "anyone ", goal.name, ", ", goal.direction
+                #print "anyone ", goal.name, ", ", goal.direction
+                direction = math.radians(goal.direction)
+                self.m.setAngles("HeadYaw", direction, 0.3)
                 self.bm.runBehavior("actions-67d9a5/Anyone")
             elif chosen is 2:
-                print "point ", goal.name, ", ", goal.direction
-                self.bm.runBehavior("actions-67d9a5/Point")
+                #print "point ", goal.name, ", ", goal.direction
+                direction = math.radians(goal.direction)
+                self.m.setAngles("HeadYaw", direction, 0.3)
+                if direction < 0:
+                    point = pointRight.PointRight(direction)
+                else:
+                    point = pointLeft.PointLeft(diretion)
+                point.run()
+                #self.bm.runBehavior("actions-67d9a5/Point")
             elif chosen is 3:
-                print "you ", goal.name, ", ", goal.direction
-                self.bm.runBehavior("actions-67d9a5/You")
+                #print "you ", goal.name, ", ", goal.direction
+                direction = math.radians(goal.direction)
+                self.m.setAngles("HeadYaw", direction, 0.3)
+                if direction < 0:
+                    you = youRight.YouRight(direction)
+                else:
+                    you = youLeft.YouLeft(diretion)
+                you.run()
+                #self.bm.runBehavior("actions-67d9a5/You")
             self.startMonitor.remove(chosen)
             # Select response to run
             if not self.resStartMonitor:
                 self.resStartMonitor = responseStartList[:]
             chosen = random.choice(self.resStartMonitor)
             if chosen is 1:
-                print "share ", goal.name, ", ", goal.direction
+                #print "share ", goal.name, ", ", goal.direction
                 self.bm.runBehavior("reponses-c397b4/Share")
             if chosen is 2:
-                print "your turn ", goal.name, ", ", goal.direction
+                #print "your turn ", goal.name, ", ", goal.direction
                 self.bm.runBehavior("reponses-c397b4/Your_turn")
             if chosen is 3:
-                print "your views ", goal.name, ", ", goal.direction
+                #print "your views ", goal.name, ", ", goal.direction
                 self.bm.runBehavior("reponses-c397b4/Your_views")
             self.resStartMonitor.remove(chosen)
             self.bm.runBehavior("actions-67d9a5/Return")
@@ -123,13 +153,13 @@ class ResponseServer:
                 self.loudMonitor = actionLoudList[:]
             chosen = random.choice(self.loudMonitor)
             if chosen is 1:
-                print "loud"
+                #print "loud"
                 self.bm.runBehavior("actions-67d9a5/Loud")
             if chosen is 2:
-                print "quiet"
+                #print "quiet"
                 self.bm.runBehavior("actions-67d9a5/Quiet")
             if chosen is 3:
-                print "ssh"
+                #print "ssh"
                 self.bm.runBehavior("actions-67d9a5/Ssh")
             self.loudMonitor.remove(chosen)
             # Select response to run
@@ -137,7 +167,7 @@ class ResponseServer:
                 self.resLoudMonitor = responseLoudList[:]
             chosen = random.choice(self.resLoudMonitor)
             if chosen is 1:
-                print "speak quiet"
+                #print "speak quiet"
                 self.bm.runBehavior("reponses-c397b4/Speak_quiet")
             self.resLoudMonitor.remove(chosen)
             self.bm.runBehavior("actions-67d9a5/Return")
@@ -149,7 +179,7 @@ class ResponseServer:
                 self.multipleMonitor = actionMultipleList[:]
             chosen = random.choice(self.multipleMonitor)
             if chosen is 1:
-                print "stop_multiple"
+                #print "stop_multiple"
                 self.bm.runBehavior("actions-67d9a5/Stop")
             self.multipleMonitor.remove(chosen)
             # Select response to run
@@ -157,7 +187,7 @@ class ResponseServer:
                 self.resMultipleMonitor = responseMultipleList[:]
             chosen = random.choice(self.resMultipleMonitor)
             if chosen is 1:
-                print "one speaker"
+                #print "one speaker"
                 self.bm.runBehavior("reponses-c397b4/One_speaker")
             self.resMultipleMonitor.remove(chosen)
             self.bm.runBehavior("actions-67d9a5/Return")
@@ -165,7 +195,8 @@ class ResponseServer:
         # If natural behaviour is commanded
         if goal.action == "natural":
             print "Act natural at %d" % goal.direction
-        self.bm.runBehavior("Return")
+            direction = math.radians(goal.direction)
+            self.m.setAngles("HeadYaw", direction, 0.3)
 
         self.server.set_succeeded()
 
