@@ -63,9 +63,9 @@ class YouLeft:
         self.times.append([0.04, 0.6, 1.56])
         self.keys.append([[0.100401, [3, -0.0133333, 0], [3, 0.186667, 0]], [0.0994838, [3, -0.186667, 0], [3, 0.32, 0]], [0.0994838, [3, -0.32, 0], [3, 0, 0]]])
 
-    def run(self):
+    def run(self, IP, Port):
         try:
-            motion = ALProxy("ALMotion", robotIP, robotPort)
+            motion = ALProxy("ALMotion", IP, Port)
             motion.angleInterpolationBezier(self.names, self.times, self.keys)
         except BaseException, err:
             print err
@@ -73,4 +73,4 @@ class YouLeft:
 if __name__=="__main__":
 
     yl = YouLeft(45)
-    yl.run()
+    yl.run(robotIP, robotPort)

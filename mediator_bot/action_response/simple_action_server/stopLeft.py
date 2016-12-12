@@ -63,10 +63,10 @@ class StopLeft:
         self.times.append([0.04, 0.6, 1.52])
         self.keys.append([[0.103232, [3, -0.0133333, 0], [3, 0.186667, 0]], [0.0994838, [3, -0.186667, 0], [3, 0.306667, 0]], [0.0994838, [3, -0.306667, 0], [3, 0, 0]]])
 
-    def run(self):
+    def run(self, IP, Port):
 
         try:
-            self.motion = ALProxy("ALMotion", robotIP, robotPort)
+            self.motion = ALProxy("ALMotion", IP, Port)
             self.motion.angleInterpolationBezier(self.names, self.times, self.keys)
         except BaseException, err:
             print err
@@ -74,5 +74,5 @@ class StopLeft:
 if __name__=="__main__":
 
     sl = StopLeft(80)
-    sl.run()
+    sl.run(robotIP, robotPort)
 

@@ -85,7 +85,7 @@ class ResponseServer:
                     stop = stopRight.StopRight(direction)
                 else:
                     stop = stopLeft.StopLeft(diretion)
-                stop.run()
+                stop.run(robotIP, robotPort)
                 #self.bm.runBehavior("actions-67d9a5/Stop")
             self.stopMonitor.remove(chosen)
             # Select response to run
@@ -117,7 +117,7 @@ class ResponseServer:
                     point = pointRight.PointRight(direction)
                 else:
                     point = pointLeft.PointLeft(diretion)
-                point.run()
+                point.run(robotIP, robotPort)
                 #self.bm.runBehavior("actions-67d9a5/Point")
             elif chosen is 3:
                 #print "you ", goal.name, ", ", goal.direction
@@ -127,7 +127,7 @@ class ResponseServer:
                     you = youRight.YouRight(direction)
                 else:
                     you = youLeft.YouLeft(diretion)
-                you.run()
+                you.run(robotIP, robotPort)
                 #self.bm.runBehavior("actions-67d9a5/You")
             self.startMonitor.remove(chosen)
             # Select response to run
