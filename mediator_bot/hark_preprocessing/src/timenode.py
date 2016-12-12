@@ -88,6 +88,7 @@ class SpeakerContainer(object):
         msg.header.stamp = rospy.Time.now()
         msg.weight = self.weight
         msg.status = self.status
+        msg.speaking = self.speaking
         self.pub.publish(msg)
 
 
@@ -119,7 +120,8 @@ class TimeAllocator:
         return dict(
             name=req.name,
             weight=speaker.weight,
-            status=speaker.status
+            status=speaker.status,
+            speaking=speaker.speaking,
         )
 
     def userAdded(self, data):
