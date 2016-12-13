@@ -72,7 +72,7 @@ class Mediate(smach.State):
     def execute(self, userdata):
         rospy.loginfo('Executing state Mediate')
         rospy.sleep(1)
-        if self.init is False
+        if self.init is False:
             self.initTimer()
         while not rospy.is_shutdown():
             # check all speakers
@@ -88,7 +88,7 @@ class Mediate(smach.State):
                 # too many speakers
                 return 'control_conv'
 
-    def initTimer(self)
+    def initTimer(self):
         rospy.Timer(rospy.Duration(30), self.callback)
         self.init = True
 
