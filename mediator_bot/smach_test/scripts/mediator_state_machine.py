@@ -17,9 +17,20 @@ class SpeakerStates:
     Container for current speaker states
     '''
     init = False
-    speakers = []
-    weight = []
-    status = []
+    speakers = {}
+    weight = {}
+    status = {}
+    speaking = {}
+
+    def checkSpeakerLevels():
+        # check if anyones spoken too much
+        # return id and level
+        return [key for key in weight if weight[key] > threshold]
+
+    def checkSpeakers():
+        # Check how many people are currently speaking
+        # return speaker ids
+        return [key for key in speaking if speaking[key] == True]
 
 ## States ##
 
@@ -72,7 +83,7 @@ class Mediate(smach.State):
     def execute(self, userdata):
         rospy.loginfo('Executing state Mediate')
         rospy.sleep(1)
-        if self.init is False
+        if self.init is False:
             self.initTimer()
         while not rospy.is_shutdown():
             # check all speakers
@@ -88,7 +99,7 @@ class Mediate(smach.State):
                 # too many speakers
                 return 'control_conv'
 
-    def initTimer(self)
+    def initTimer(self):
         rospy.Timer(rospy.Duration(30), self.callback)
         self.init = True
 
@@ -161,30 +172,24 @@ class CloseTopic(smach.State):
 
 ## Callback funcs
 def callbackSpeakerState(data):
-    SpeakerStates.weight[data.name] = data.weight;
-    SpeakerStates.status[data.name] = data.status;
+    SpeakerStates.weight[data.name] = data.weight
+    SpeakerStates.status[data.name] = data.status
+    SpeakerStates.speaking[data.name] = data.speaking
 
 def callbackNewSpeaker(data):
+    # register speakers
     SpeakerStates.speakers.append(data.name)
-    SpeakerStates.weight[data.name] = 0.0;
-    SpeakerStates.status[data.name] = 0;
+    SpeakerStates.weight[data.name] = 0.0
+    SpeakerStates.status[data.name] = 0
+    SpeakerStates.speaking[data.name] = false
 
 #def callbackLoud(): # too loud
 # Compute average power of the frames and make sure it doesnt exceed a threshold
 
 ## Status checking functions ##
 
-def checkSpeakerLevels():
-    # check if anyones spoken too much
-    # return id and level
-    pass
 
-def checkSpeakers():
-    # Check how many people are currently speaking
-    # return speaker ids
-    # return true or false if there is a conflic
-    pass
-
+    
 def main():
     rospy.init_node('mediatorbot_state_machine')
 
