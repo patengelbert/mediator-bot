@@ -269,7 +269,7 @@ class CloseTopic(smach.State):
 
 # Status checking functions #
 
-def started():
+def started(data):
     global running
     running = True
 
