@@ -20,6 +20,7 @@ class Status(Enum):
 
 class Speaker(object):
     def __init__(self, label, azimuth=0.0, weight=0.0, speaking=False):
+	rospy.logdebug("Adding speaker {}".format(label))
         self.label = label
         self.azimuth = azimuth
         self.weight = weight
@@ -38,6 +39,7 @@ class SpeakerStates:
         self.speakers[data.name] = Speaker(data.name)
 
     def updateSpeaker(self, data):
+	rospy.logdebug("Updating speaker {} -> {}".format(data.name, Status(data.status)))
         speaker = self.speakers.get(data.name, None)
         if speaker is None:
             self.addNewSpeaker(data)
