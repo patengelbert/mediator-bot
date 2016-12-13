@@ -14,7 +14,11 @@ if __name__ == '__main__':
     client = actionlib.SimpleActionClient('response', responseAction)
     client.wait_for_server()
 
-    goal = responseGoal(keywords=["look"], name="Mark", direction=45)
+    goal = responseGoal(keywords=["intro"], name="Meng", direction=45)
+    client.send_goal(goal)
+    client.wait_for_result(rospy.Duration.from_sec(5.0))
+
+    goal = responseGoal(keywords=["look"], name="Meng", direction=45)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
@@ -26,9 +30,7 @@ if __name__ == '__main__':
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    time.sleep(10)
-
-    goal = responseGoal(keywords=["stop"], name="Mark", direction=45)
+    goal = responseGoal(keywords=["stop", "polite"], name="Mark", direction=45)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 
@@ -113,6 +115,20 @@ if __name__ == '__main__':
     time.sleep(2)
 
     goal = responseGoal(keywords=["loud"])
+    client.send_goal(goal)
+    client.wait_for_result(rospy.Duration.from_sec(5.0))
+
+    time.sleep(2)
+
+
+    goal = responseGoal(keywords=["nearly_done"], name="Meng", direction=0)
+    client.send_goal(goal)
+    client.wait_for_result(rospy.Duration.from_sec(5.0))
+
+    time.sleep(2)
+
+
+    goal = responseGoal(keywords=["outro"], name="Meng", direction=45)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 

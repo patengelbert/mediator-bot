@@ -72,7 +72,6 @@ class SpeakerStates:
         return l[0] if len(l) > 0 else None
 
 
-
 speakerStates = SpeakerStates()
 
 

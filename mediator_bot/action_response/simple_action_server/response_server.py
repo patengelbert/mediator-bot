@@ -1,53 +1,17 @@
 #! /usr/bin/env python
-import math
 import rospy
 import actionlib
 import random
 
-from collections import defaultdict
-
-import pointLeft
-import pointRight
-import stopLeft
-import stopRight
-import youLeft
-import youRight
 from naoqi import ALProxy
 
 from action_response.msg import responseAction
 
+ALLOW_ANGRY_ACTIONS = False
+
 from actions import (
     MovementAction,
     ResponseAction,
-    StopSomeoneElseResponse,
-    StopRaiseArmMotion,
-    StopThanksResponse,
-    StartAnyoneMovement,
-    StartPointMovement,
-    StartAnyThoughtsResponse,
-    ShareThoughtsResponse1,
-    ShareThoughtsResponse2,
-    PointPalmUpAction,
-    YouTurnResponse,
-    YouViewResponse,
-StopTooLoudMovement,
-StopQuietMovement,
-StopShhMovement,
-StopQuietEmptyResponse,
-StopQuietResponse,
-StopShhResponse,
-StopMultipleResponse,
-StopMultipleMovement,
-StopMultipleResponse2,
-LookAtSpeaker,
-)
-
-# NAO IP address and port
-
-robotIP = "169.254.44.123"
-robotPort = 9559
-
-actionsToAdd = [
     StopSomeoneElseResponse,
     StopRaiseArmMotion,
     StopThanksResponse,
@@ -65,11 +29,61 @@ actionsToAdd = [
     StopQuietEmptyResponse,
     StopQuietResponse,
     StopShhResponse,
-StopMultipleMovement,
-StopMultipleResponse,
-StopMultipleResponse2,
-LookAtSpeaker,
-]
+    StopMultipleResponse,
+    StopMultipleMovement,
+    StopMultipleResponse2,
+    LookAtSpeaker,
+    StopDidISAskYouResponse,
+    StopMultipleResponseNamed,
+IntroOutroMovement,
+IntroResponse,
+OutroResponse,
+NearlyDoneResponse,
+)
+
+# NAO IP address and port
+
+robotIP = "169.254.227.53"
+robotPort = 9559
+
+actionsToAdd = {
+    StopSomeoneElseResponse,
+    StopRaiseArmMotion,
+    StopThanksResponse,
+    StartAnyoneMovement,
+    StartPointMovement,
+    StartAnyThoughtsResponse,
+    ShareThoughtsResponse1,
+    ShareThoughtsResponse2,
+    PointPalmUpAction,
+    YouTurnResponse,
+    YouViewResponse,
+    StopTooLoudMovement,
+    StopQuietMovement,
+    StopShhMovement,
+    StopQuietEmptyResponse,
+    StopQuietResponse,
+    StopShhResponse,
+    StopMultipleMovement,
+    StopMultipleResponse,
+    StopMultipleResponse2,
+    LookAtSpeaker,
+    StopDidISAskYouResponse,
+    StopMultipleResponseNamed,
+IntroOutroMovement,
+IntroResponse,
+OutroResponse,
+NearlyDoneResponse,
+}
+
+if not ALLOW_ANGRY_ACTIONS:
+    actionsToAdd = set([a for a in actionsToAdd if "angry" not in a.keywords])
+
+
+def changeName(name):
+    if name.lower() == "yiannis":
+        return "yannis"
+    return name
 
 
 class ActionLibraryError(Exception):
@@ -179,9 +193,11 @@ class ResponseServer:
         m = actionLibrary.getMovementAction(kw)
         r = actionLibrary.getResponseAction(kw)
         if m is not None:
-            m.run(max(min(goal.direction, 90.0), -90.0))
+            dir = goal.direction if goal.direction is not None else 0.0
+            m.run(max(min(dir, 90.0), -90.0))
         if r is not None:
-            r.run(goal.name)
+            name = goal.name if goal.name is not None else ""
+            r.run(changeName(name))
 
         self.bm.runBehavior("actions-67d9a5/Return")
         self.bm.startBehavior("actions-67d9a5/Breathe")
