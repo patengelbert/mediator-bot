@@ -54,10 +54,16 @@ class SpeakerStates:
         return [s for s in self.speakers.itervalues() if s.status == Status.TOO_SHORT]
 
     def getNextTooShortSpeaker(self):
-        return random.choice(self.getTooShortSpeakers())
+	s = self.getTooShortSpeakers()
+	if len(s) == 0:
+		return None
+        return random.choice(s)
 
     def getNextTooLongSpeaker(self):
-        return random.choice(self.getTooLongSpeakers())
+	s = self.getTooLongSpeakers()
+	if len(s) == 0:
+		return None
+        return random.choice(s)
 
     def getActiveSpeakers(self):
         return [s for s in self.speakers.itervalues() if s.speaking]
@@ -164,11 +170,11 @@ class Mediate(smach.State):
     def execute(self, userdata):
         rospy.loginfo('Executing state Mediate')
         rospy.sleep(3)
-        if self.init is False:
+        if not self.init:
             self.initTimer()
         while not rospy.is_shutdown():
-            if (rospy.Time.now() - self.timerStart) < rospy.Duration(10) and not self.timeup:
-                self.client.send_goal(keywords=["nearly_done"], direction=0.0, name="")
+            if (rospy.Time.now() - self.timerStart) > rospy.Duration(self.duration - 30) and not self.timeup:
+                self.client.req(keywords=["nearly_done"], direction=0.0, name="")
             elif self.timeup:
                 # time run out
                 return 'timeup'
