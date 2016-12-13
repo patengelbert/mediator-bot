@@ -142,7 +142,7 @@ class StartTopic(smach.State):
 
     def introSequence(self):
         rospy.loginfo('*Intro Sequence*')
-        self.client.send_goal(keywords=["intro"], name="", direction=0.0)
+        self.client.req(keywords=["intro"], name="", direction=0.0)
 
 
 # define state Mediate
