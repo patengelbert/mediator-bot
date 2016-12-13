@@ -158,6 +158,7 @@ class TimeAllocator:
         self.rate = rate
 
     def started(self, data):
+        rospy.loginfo("Starting timing")
         self.start = True
 
     def printMultProgress(self, barLength=50):
