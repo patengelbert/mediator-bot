@@ -89,6 +89,7 @@ class SpeakerContainer(object):
         msg.header = rospy.Header()
         msg.header.stamp = rospy.Time.now()
         msg.weight = self.weight
+        msg.name = self.label
         msg.status = self.status.value
         msg.speaking = self.speaking
         if len(self.azimuths) == 0:

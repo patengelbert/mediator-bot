@@ -110,7 +110,7 @@ class State(smach.State):
             return self._execute(userdata)
         except Exception as e:
             rospy.logerr(e)
-            return 'errored'
+            return None #Kill thread
 
     def _execute(self, userdata):
         raise NotImplementedError
@@ -123,7 +123,7 @@ class State(smach.State):
     def checkPreemption(self):
         if self.preempt_requested():
             self.service_preempt()
-            return 'preempted'
+            return None #Kill thread
 
     def __str__(self):
         return self.__class__.__name__
