@@ -20,16 +20,32 @@ function user_interface(){
   this.transcript=[];
   this.display_lifespan=5;
   this.current_face="happy";
-  this.current_action="too_loud"; 
+  this.current_action="loud"; 
   this.current_person="Bob";
   this.message="";
   
-  this.actions={none: ["", ""], 
-                speaking_over: ["Please don't speak over eachother", "don't speak over, let everyone get a chance"],
-                too_loud: ["Please speak more softly"," don't speak so loud"] ,
-                dominated: ["Please let everyone get an even say"," don't dominate the conversation"],
-		too_quiet: ["Please speak a little louder", " come on speak up!"]
-  };
+  this.actions={
+    natural: ["", ""], 
+    multiple: ["Please don't speak over each other","Don't speak over, let everyone get a chance"],
+    loud: ["Please speak more softly", "Did I ask for your input?"] ,
+    stop: ["Please stop speaking", "Shush"],
+		thanks: ["Thank you for following our instructions",""],
+    start: ["Do you have any thoughts on the matter?", "Come on what do you think?"],
+    nearly_done: ["The time for this discussion is nearly up. Are there any last comments?", ""],
+    outro: ["Thank you for your time. I hope you found this discussion helpful.","Thank god this is over.."],
+    select_other: ["Can we hear from someone else please","Let someone else speak!"]
+ /*   
+    natural: [[""],[ ""]], 
+    multiple: [["Please don't speak over each other","Please, one person at a time"],["Don't speak over, let everyone get a chance"]],
+    loud: [["Please speak more softly","Please don't speak so loud"], ["Did I ask for your input?"]] ,
+    stop: [["Please stop speaking", "Please let other people speak", "Thank you for your contribution"],["Shut up!", "Shush"]],
+		thanks: [["Thank you for following our instructions"], [""]]
+    start: [["Do you have any thoughts on the matter?"], "Come on what do you think?"]
+    nearly_done: [["The time for this discussion is nearly up. Are there any last comments?"],[""]]
+    outro: [["Thank you for your time. I hope you found this discussion helpful."],["Thank god this is over.."]]
+    select_other: [["Can we hear from someone else please"],["Let someone else speak!"]]
+*/
+    };
   this.demo = function (){
     this.robot_mode=POLITE;
     this.gui_mode="all";
