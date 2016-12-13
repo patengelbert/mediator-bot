@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import threading
 
+import datetime
 import rospy
 import std_msgs.msg
 from enum import Enum
@@ -55,7 +56,7 @@ class Node(object):
         self.transcriptionPublisher = rospy.Publisher('transcriptions', SentenceTranscription, queue_size=10)
         self.speakerPublisher = rospy.Publisher('speaker', Speaker, queue_size=10)
         self.userAddedPublisher = rospy.Publisher("added_user", AddedUser, queue_size=4, latch=True)
-        self.startedPublisher = rospy.publisher("start_recognition", StartRecognitionMsg, queue_size=1, latch=True)
+        self.startedPublisher = rospy.Publisher("start_recognition", StartRecognitionMsg, queue_size=1, latch=True)
 
         rospy.Subscriber("HarkSrcWave", HarkSrcWave, self.addToStreams)
 
@@ -315,7 +316,11 @@ class Node(object):
             elif self.action == Actions.Enroll:
                 self.checkEnrollStream()
 
-        self.recogniser.dump("models/{}.bin".format(rospy.get_time()))
+        rospy.loginfo("Stopping")
+
+        fn = "models/{}_{}.bin".format('_'.join(self.recogniser.features.keys()), datetime.date.today())
+        rospy.loginfo("Saving model as {}".format(fn))
+        self.recogniser.dump(fn)
 
 
 if __name__ == '__main__':
