@@ -241,7 +241,7 @@ class CloseTopic(smach.State):
 def main():
     rospy.init_node('mediatorbot_state_machine', log_level=rospy.DEBUG)
 
-    rospy.Subscriber("/speaker", AddedUser, speakerStates.addNewSpeaker)
+    rospy.Subscriber("/added_user", AddedUser, speakerStates.addNewSpeaker)
     rospy.Subscriber("/speaker_change_state", MedBotSpeechStatus, speakerStates.updateSpeaker)
 
     # Create a SMACH state machine

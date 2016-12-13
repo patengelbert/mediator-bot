@@ -185,7 +185,12 @@ class Node(object):
             message.duration = stream.duration
             message.speaker = stream.speaker
             message.since_last_update = tNow - stream.lastUpdate
-            message.azimuth = reduce(lambda x, y: x + y, stream.azimuths) / len(stream.azimuths)
+            if len(stream.azimuths) == 0:
+                message.azimuth = 0
+            elif len(stream.azimuths) == 1:
+                message.azimuth = stream.azimuths[0]
+            else:
+                message.azimuth = reduce(lambda x, y: x + y, stream.azimuths) / len(stream.azimuths)
             stream.lastUpdate = tNow
 
         if publisher is not None:
