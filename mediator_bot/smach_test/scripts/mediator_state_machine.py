@@ -95,8 +95,8 @@ class ActionClient(object):
 
 running = False
 
-class State(smach.State):
 
+class State(smach.State):
     outcomes = []
 
     def __init__(self, speakerStates, client):
@@ -290,26 +290,39 @@ def main():
     rospy.Subscriber("/added_user", AddedUser, speakerStates.addNewSpeaker)
     rospy.Subscriber("/speaker_change_state", MedBotSpeechStatus,
                      speakerStates.updateSpeaker)  # Create a SMACH state machine
-    sm = smach.StateMachine(outcomes=['end', 'preempted'])
+    sm = smach.StateMachine(outcomes=['end', 'preempted', 'errored'])
 
     with sm:
         # Add states to the container
         smach.StateMachine.add('Initialise', Initialise(speakerStates, actionclient),
                                transitions={'initialised': 'StartTopic',
-                                            'preempted': 'preempted'})
+                                            'preempted': 'preempted',
+                                            'errored': 'errored'})
         smach.StateMachine.add('StartTopic', StartTopic(speakerStates, actionclient),
-                               transitions={'intro_complete': 'Mediate'})
+                               transitions={'intro_complete': 'Mediate',
+                                            'preempted': 'preempted',
+                                            'errored': 'errored'})
         smach.StateMachine.add('Mediate', Mediate(speakerStates, actionclient),
                                transitions={'timeup': 'CloseTopic', 'control_conv': 'Quieten',
-                                            'not_speaking': 'AskQuestion'})
+                                            'not_speaking': 'AskQuestion',
+                                            'preempted': 'preempted',
+                                            'errored': 'errored'})
         smach.StateMachine.add('Quieten', Quieten(speakerStates, actionclient),
-                               transitions={'success': 'Happy', 'failed': 'Mediate'})
+                               transitions={'success': 'Happy', 'failed': 'Mediate',
+                                            'preempted': 'preempted',
+                                            'errored': 'errored'})
         smach.StateMachine.add('Happy', Happy(speakerStates, actionclient),
-                               transitions={'success': 'Mediate'})
+                               transitions={'success': 'Mediate',
+                                            'preempted': 'preempted',
+                                            'errored': 'errored'})
         smach.StateMachine.add('AskQuestion', AskQuestion(speakerStates, actionclient),
-                               transitions={'success': 'Mediate'})
+                               transitions={'success': 'Mediate',
+                                            'preempted': 'preempted',
+                                            'errored': 'errored'})
         smach.StateMachine.add('CloseTopic', CloseTopic(speakerStates, actionclient),
-                               transitions={'finished': 'end', 'next_topic': 'StartTopic'})
+                               transitions={'finished': 'end', 'next_topic': 'StartTopic',
+                                            'preempted': 'preempted',
+                                            'errored': 'errored'})
 
     # Execute SMACH plan
     smach_thread = threading.Thread(target=sm.execute)
