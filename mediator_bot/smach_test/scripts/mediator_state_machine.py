@@ -2,36 +2,75 @@
 import threading
 
 import rospy
+import random
 import smach
 import smach_ros
+from enum import Enum
 from mediator_bot_msgs.msg import MedBotSpeechStatus
 from speech_speaker_recognition.msg import AddedUser
 
 
-# TODO import other timing messages
+class Status(Enum):
+    NO_STATUS = 0
+    TOO_LONG = 1
+    TOO_SHORT = 2
 
-THRESHOLD = 1
 
+class Speaker(object):
+
+    def __init__(self, label, azimuth=0.0, weight=0.0, speaking=False):
+        self.label = label
+        self.azimuth = azimuth
+        self.weight = weight
+        self.speaking = speaking
+        self.status = Status.NO_STATUS
 
 class SpeakerStates:
     """
     Container for current speaker states
     """
     init = False
-    speakers = []
-    weight = {}
-    status = {}
-    speaking = {}
+    speakers = {}
 
-    def checkSpeakerLevels(self):
-        # check if anyones spoken too much
-        # return id and level
-        return [key for key, v in self.weight.iteritems() if v > THRESHOLD]
+    def addNewSpeaker(self, data):
+        self.speakers[data.name] = Speaker(data.name)
 
-    def checkSpeakers(self):
-        # Check how many people are currently speaking
-        # return speaker ids
-        return [key for key, v in self.speaking.itervalues() if v is True]
+    def updateSpeaker(self, data):
+        speaker = self.speakers.get(data.name, None)
+        if speaker is None:
+            self.addNewSpeaker(data)
+            speaker = self.speakers[data.name]
+        speaker.azimuth = data.azimuth
+        speaker.weight = data.weight
+        speaker.status = Status(data.status)
+        speaker.speaking = data.speaking
+
+    def getTooLongSpeakers(self):
+        return [s for s in self.speakers.itervalues() if s.status == Status.TOO_LONG]
+
+    def getTooShortSpeakers(self):
+        return [s for s in self.speakers.itervalues() if s.status == Status.TOO_SHORT]
+
+    def getNextTooShortSpeaker(self):
+        return random.choice(self.getTooShortSpeakers())
+
+    def getNextTooLongSpeaker(self):
+        return random.choice(self.getTooLongSpeakers())
+
+    def getActiveSpeakers(self):
+        return [s for s in self.speakers.itervalues() if s.speaking]
+
+    def getNumActiveSpeakers(self):
+        return len(self.getActiveSpeakers())
+
+    def getLowestWeightedSpeaker(self):
+        l = sorted(self.speakers.values(), key=lambda x: x.weight)
+        return l[0] if len(l) > 0 else None
+
+    def getHighestWeightedSpeaker(self):
+        l = sorted(self.speakers.values(), key=lambda x: x.weight, reverse=True)
+        return l[0] if len(l) > 0 else None
+
 
 speakerStates = SpeakerStates()
 
@@ -193,23 +232,6 @@ class CloseTopic(smach.State):
         return 'finished'
 
 
-## end of states ##
-
-## Callback funcs
-def callbackSpeakerState(data):
-    speakerStates.weight[data.name] = data.weight
-    speakerStates.status[data.name] = data.status
-    speakerStates.speaking[data.name] = data.speaking
-
-
-def callbackNewSpeaker(data):
-    # register speakers
-    speakerStates.speakers.append(data.name)
-    speakerStates.weight[data.name] = 0.0
-    speakerStates.status[data.name] = 0
-    speakerStates.speaking[data.name] = False
-
-
 # def callbackLoud(): # too loud
 # Compute average power of the frames and make sure it doesnt exceed a threshold
 
@@ -219,8 +241,8 @@ def callbackNewSpeaker(data):
 def main():
     rospy.init_node('mediatorbot_state_machine', log_level=rospy.DEBUG)
 
-    rospy.Subscriber("/speaker", AddedUser, callbackNewSpeaker)
-    rospy.Subscriber("/speaker_change_state", MedBotSpeechStatus, callbackSpeakerState)
+    rospy.Subscriber("/speaker", AddedUser, speakerStates.addNewSpeaker)
+    rospy.Subscriber("/speaker_change_state", MedBotSpeechStatus, speakerStates.updateSpeaker)
 
     # Create a SMACH state machine
     sm = smach.StateMachine(outcomes=['end', 'preempted'])

@@ -10,7 +10,7 @@ MAXREQUESTS = 14400 + 50000  # Free + Trial
 RPCPERIOD = 0.5
 TIMEOUT = 10
 MAXCONCURRENT = 4
-SPEAKERMODEL = "test.bin"
+SPEAKERMODEL = None
 
 DISCOVERY_URL = ('https://{api}.googleapis.com/$discovery/rest?'
                  'version={apiVersion}')

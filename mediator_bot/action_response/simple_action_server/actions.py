@@ -59,7 +59,7 @@ class StopSomeoneElseResponse(ResponseAction):
 
 
 class StopRaiseArmMotion(MovementAction):
-    keywords = {"stop"}
+    keywords = {"stop", "nearly_done"}
 
     def _movement(self, direction):
         direction = math.radians(direction)
@@ -81,6 +81,13 @@ class StopThanksResponse(ResponseAction):
 
     def _response(self, name):
         self.textToSpeechProxy.say("Thank you for your contribution {}".format(name))
+
+
+class ThankYouResponse(ResponseAction):
+    keywords = {"thanks"}
+
+    def _response(self, name):
+        self.textToSpeechProxy.say("Thank you")
 
 
 class StartAnyoneMovement(MovementAction):
@@ -192,7 +199,7 @@ class StopQuietResponse(ResponseAction):
 
 
 class StopShhResponse(ResponseAction):
-    keywords = {"stop", "loud"}
+    keywords = {"stop", "loud", "angry"}
 
     def _response(self, name):
         self.textToSpeechProxy.say("Shush")
@@ -218,6 +225,13 @@ class StopMultipleResponse2(ResponseAction):
     def _response(self, name):
         self.textToSpeechProxy.say("Please, one person at a time")
 
+class StopMultipleResponseNamed(ResponseAction):
+    keywords = {"stop", "multiple", "directed"}
+
+    def _response(self, name):
+        self.textToSpeechProxy.say("{}, please let other people speak".format(name))
+
+
 class LookAtSpeaker(MovementAction):
     keywords = {"look", "natural"}
 
@@ -225,3 +239,37 @@ class LookAtSpeaker(MovementAction):
         direction = math.radians(direction)
         self.movementProxy.setAngles("HeadYaw", direction, 0.3)
         time.sleep(1)
+
+class IntroOutroMovement(MovementAction):
+    keywords = {"intro", "outro"}
+
+    def _movement(self, direction):
+        self.movementProxy.setAngles("HeadPitch", math.radians(20.0), 0.3)
+        time.sleep(1)
+        self.movementProxy.setAngles("HeadYaw", math.radians(-45.0), 0.3)
+        time.sleep(1)
+        self.movementProxy.setAngles("HeadYaw", math.radians(45.0), 0.3)
+        time.sleep(2)
+        self.movementProxy.setAngles("HeadYaw", 0.0, 0.3)
+        time.sleep(1)
+
+
+class IntroResponse(ResponseAction):
+    keywords = {"intro"}
+
+    def _response(self, name):
+        self.textToSpeechProxy.say("Welcome to this meeting with me, Neeil")
+
+
+class OutroResponse(ResponseAction):
+    keywords = {"outro"}
+
+    def _response(self, name):
+        self.textToSpeechProxy.say("Thank you for your time. I hope you found this discussion helpful.")
+
+
+class NearlyDoneResponse(ResponseAction):
+    keywords = {"nearly_done"}
+
+    def _response(self, name):
+        self.textToSpeechProxy.say("The time for this discussion is nearly up. Are there any last comments?")
