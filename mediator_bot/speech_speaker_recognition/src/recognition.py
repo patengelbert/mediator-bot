@@ -294,15 +294,20 @@ class Node(object):
         rospy.loginfo("Starting")
 
         rate = rospy.Rate(1)
-
+        firstLoop = True
         while not rospy.is_shutdown():
             rate.sleep()
             if self.action == Actions.Recognise:
+                if self.numAdded > 0 and firstLoop:
+                    self.recogniser.train()
+                    firstLoop = False
                 self.checkStreams()
                 self.cleanStreams()
 
             elif self.action == Actions.Enroll:
                 self.checkEnrollStream()
+
+        self.recogniser.dump("models/{}.bin".format(rospy.get_time()))
 
 
 if __name__ == '__main__':
