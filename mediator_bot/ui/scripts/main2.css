@@ -30,6 +30,16 @@ input{
   display:inline-block;
   clear:both;
 }
+#drop_down{
+  padding:0;
+  margin:0;
+}
+#drop_down_contain{
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:5;
+}
 
 #submit_name{
   width:40%;

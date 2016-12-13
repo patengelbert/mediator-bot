@@ -233,6 +233,16 @@ $("#home_link").click(function(){
 
   //set_test_mode(TEST_MODE);
 });
+
+
+$('#change_mode').click(function(){
+  var newMode=$('#test_modes').val();
+  if(ui.test_mode==SET_UP){
+    TEST_MODE=newMode;
+  }else{
+    set_test_mode(newMode);
+  }
+});
 /*
 $("#submit_name").click(function(){
   console.log("sup");
