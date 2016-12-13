@@ -91,7 +91,12 @@ class SpeakerContainer(object):
         msg.weight = self.weight
         msg.status = self.status.value
         msg.speaking = self.speaking
-        msg.azimuth = reduce(lambda x, y: x + y, [float(a) for a in self.azimuths]) / float(len(self.azimuths))
+        if len(self.azimuths) == 0:
+            msg.azimuth = 0
+        elif len(self.azimuths) == 1:
+            msg.azimuth = self.azimuths[0]
+        else:
+            msg.azimuth = reduce(lambda x, y: x + y, [float(a) for a in self.azimuths]) / float(len(self.azimuths))
         self.pub.publish(msg)
 
 
