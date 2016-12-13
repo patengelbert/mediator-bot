@@ -7,7 +7,7 @@ export LOC=$PROJECTDIR/config/kinect_tf.zip
 echo $PROJECTDIR
 
 # Run to adjust the systems parameters
-rosrun rqt_reconfigure rqt_reconfigure&
+rosrun rqt_reconfigure rqt_reconfigure &
 
 echo "Preprocessing module"
 echo batchflow "$PROJECTDIR/hark_preprocessing/preprocessing.n" ${LOC} ${DEVICE}
