@@ -4,7 +4,7 @@ import rospy
 import sys
 
 from enum import Enum
-from speech_speaker_recognition.msg import AddedUser, Speaker
+from speech_speaker_recognition.msg import AddedUser, Speaker, StartRecognitionMsg
 from mediator_bot_msgs.msg import MedBotSpeechTiming, MedBotSpeechStatus
 from mediator_bot_msgs.srv import MedBotSpeechQuery
 
@@ -144,8 +144,10 @@ class TimeAllocator:
 
         # Flag. Module in init stage
         self.init = True
+        self.start = False
 
         # Create subscribers/publishers
+        rospy.Subscriber("start_recognition", StartRecognitionMsg, self.started)
         rospy.Subscriber("added_user", AddedUser, self.userAdded)
         rospy.Subscriber("speaker", Speaker, self.callback)
         self.pub = rospy.Publisher('/speaker_change_state', MedBotSpeechStatus, queue_size=10, latch=True)
@@ -154,6 +156,9 @@ class TimeAllocator:
         rospy.Service('/query_speaker_state', MedBotSpeechQuery, self.getSpeechStatus)
 
         self.rate = rate
+
+    def started(self, data):
+        self.start = True
 
     def printMultProgress(self, barLength=50):
         """
@@ -164,6 +169,8 @@ class TimeAllocator:
         @params:
             barLength   - Optional  : character length of bar (Int)
         """
+        if not self.start:
+            return
 
         if not self.init:
             sys.stdout.write(''.join([CURSOR_UP_ONE] * len(self.speakers)))

@@ -6,7 +6,7 @@ import std_msgs.msg
 from enum import Enum
 from hark_msgs.msg import HarkSrcWave
 from speaker_recognition import SpeakerRecognizer
-from speech_speaker_recognition.msg import SentenceTranscription, Speaker, AddedUser
+from speech_speaker_recognition.msg import SentenceTranscription, Speaker, AddedUser, StartRecognitionMsg
 from speech_speaker_recognition.srv import StartEnrollment, EndEnrollment, StartRecognition, SaveModel, LoadModel
 from config import (
     SPEAKERMODEL,
@@ -55,6 +55,7 @@ class Node(object):
         self.transcriptionPublisher = rospy.Publisher('transcriptions', SentenceTranscription, queue_size=10)
         self.speakerPublisher = rospy.Publisher('speaker', Speaker, queue_size=10)
         self.userAddedPublisher = rospy.Publisher("added_user", AddedUser, queue_size=4, latch=True)
+        self.startedPublisher = rospy.publisher("start_recognition", StartRecognitionMsg, queue_size=1, latch=True)
 
         rospy.Subscriber("HarkSrcWave", HarkSrcWave, self.addToStreams)
 
@@ -288,6 +289,11 @@ class Node(object):
         msg.name = name
         self.userAddedPublisher.publish(msg)
 
+    def sendStart(self):
+        msg = StartRecognitionMsg()
+        addHeader(msg)
+        self.startedPublisher.publish(msg)
+
     def start(self):
         self.rpcDispatcher.start()
 
@@ -298,8 +304,10 @@ class Node(object):
         while not rospy.is_shutdown():
             rate.sleep()
             if self.action == Actions.Recognise:
-                if self.numAdded > 0 and firstLoop:
-                    self.recogniser.train()
+                if firstLoop:
+                    if self.numAdded > 0:
+                        self.recogniser.train()
+                    self.sendStart()
                     firstLoop = False
                 self.checkStreams()
                 self.cleanStreams()

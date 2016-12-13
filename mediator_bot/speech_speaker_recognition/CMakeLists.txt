@@ -50,6 +50,7 @@ add_message_files(
   SentenceTranscription.msg
   Speaker.msg
   AddedUser.msg
+  StartRecognitionMsg.msg
 )
 
 ## Generate services in the 'srv' folder
