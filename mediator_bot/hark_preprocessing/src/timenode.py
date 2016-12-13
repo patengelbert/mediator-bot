@@ -85,13 +85,13 @@ class SpeakerContainer(object):
             self.status = Status.NO_STATUS
 
     def sendMessage(self):
-        msg = MedBotSpeechTiming()
+        msg = MedBotSpeechStatus()
         msg.header = rospy.Header()
         msg.header.stamp = rospy.Time.now()
         msg.weight = self.weight
-        msg.status = self.status
+        msg.status = self.status.value
         msg.speaking = self.speaking
-        msg.azimuth = reduce(lambda x, y: x + y, self.azimuths) / len(self.azimuths)
+        msg.azimuth = reduce(lambda x, y: x + y, [float(a) for a in self.azimuths]) / float(len(self.azimuths))
         self.pub.publish(msg)
 
 
