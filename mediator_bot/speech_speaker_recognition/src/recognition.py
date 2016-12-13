@@ -293,6 +293,7 @@ class Node(object):
     def sendStart(self):
         msg = StartRecognitionMsg()
         addHeader(msg)
+        msg.start = True
         self.startedPublisher.publish(msg)
 
     def start(self):
