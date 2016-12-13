@@ -1,0 +1,64 @@
+<html>
+  <head>
+    <title>Mediator-bot</title>
+   
+    <link rel="stylesheet" type="text/css" href="main2.css">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script> 
+
+<script type="text/javascript" src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script> 
+
+     <script type="text/javascript" src="http://cdn.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+    <script src="main.js" ></script>
+  <!--?q=1280549780-->
+  </head>
+  <body>
+    <div class="content">
+      <!-- Face display -->
+        <div id="container">
+        <div id="face">
+            <img src="assets/neutral_face.png" />
+        </div>
+        <div id="small_msg">
+        </div>
+        </div>
+      <!-- Register Person Form -->
+        <div id="set_up">
+          <form id="person_setup">
+            <input type="text" name="person" >     
+          </form>
+<button id="submit_name">Start Person Registration</button><br>
+       <div id="sentence_to_speak"></div><br>
+       <div id="new_people"></div>
+ </div>
+      <!-- Big message only-->
+        
+        <div id="big_msg">
+        </div>
+
+      <!-- Bar graph -->
+
+        <div id="bar_graph">
+          <h2>Speech Quantity Analysis</h2>
+          <!--
+          {% for user in speech %}
+            <div style="width:{{user[1]}}%">
+              <span>{{user[0]}}</span>
+            </div>
+          {% endfor %}
+          -->
+        </div>
+
+      <!-- Pi chart only-->
+      <div id="pie_graph">
+      </div>
+    </div>
+    <div class="menu">
+      <div class="overlay"></div>
+      <div class="underlay"></div>
+      <span id="home_link">LIVE</span>
+      <div id="separator"></div>
+      <span id="set_up_link">SET UP</span>
+    </div>
+
+  </body>
+</html>

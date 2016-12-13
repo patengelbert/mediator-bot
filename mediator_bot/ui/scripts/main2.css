@@ -1,0 +1,200 @@
+html, body{
+  max-height:100vh;
+  max-width:100%;
+  font-size:16pt;
+  font-family: Verdana;
+  margin:0;
+  padding:0;
+}
+form {
+  width:100%;
+ 
+  display:inline-block;
+  padding:2em;
+  box-sizing:border-box;
+  }
+input{
+  width:60%;
+  height:4em;
+  
+}
+#new_people{
+  width:40%;
+  height:4em;
+  color:green;
+  display:inline-block;
+}
+#sentence_to_speak{
+  width:80%;
+  height:4em;
+  display:inline-block;
+  clear:both;
+}
+
+#submit_name{
+  width:40%;
+  height:4em;
+  display:inline-block;
+  border-radius:20px;
+  clear:both;
+}
+#set_up{
+  text-align:center;
+  width:100%;
+  height:100%;
+  visibility:hidden;
+  position:absolute;
+  z-index:4;
+}
+
+
+
+.menu span{
+  margin-top:0%;
+  width:49.5%;
+  height:10%;
+  display:block;
+  padding-top:0.5em;
+  float:left;
+  font-size:1.5em;
+  text-decoration:bold;
+ 
+}
+.menu #separator{
+  width:0.4%;
+  display:block;
+  height:90%;
+  background-color:white;
+  position:absolute;
+  z-index:2;
+  opacity:0.8;
+  margin-left:49.8%;
+  margin-top:5px;
+}
+
+.menu .overlay{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index:-1;
+    background-image: url(assets/brand-gradient--primary.svg);
+}
+.menu .underlay{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index:-2;
+    background-image: url(assets/hex.jpg);
+    background-position: left;
+    background-repeat: repeat;
+}
+
+.menu{
+  text-align:center;
+  color:white;
+  height:10%;
+  width:100%;
+  overflow:hidden;
+  position:relative;
+  box-sizing:border-box;
+}
+.content{
+  width:100%;
+  height:90%;
+  color:black;
+  overflow:hidden;
+  position:relative;
+
+}
+
+#face{
+  text-align:center;
+  height:80%;
+  width:100%;
+  display:block;
+  overflow:hidden;
+
+}
+#small_msg{
+  height:20%;
+  width:100%;
+  display:block;
+  overflow:hidden;
+  color:black;
+  text-align:center;
+  font-size:2em;
+  padding-top:1em;
+  box-sizing:border-box;
+
+}
+
+#big_msg{
+  height:100%;
+  width:100%;
+  display:block;
+  overflow:hidden;
+  color:black;
+  text-align:center;
+  font-size:5em;
+  padding:1em;
+  box-sizing:border-box;
+  visibility:hidden;
+  position:absolute;
+  z-index:1;
+}
+
+#face img{
+  height:90%;
+  width:auto;
+  margin-top:5%;
+  display:inline-block;
+  box-sizing:border-box;
+}
+#bar_graph{
+  height:100%;
+  width:100%;
+  display:block;
+  box-sizing:border-box;
+  padding:2em;
+  visibility:hidden;
+  position:absolute;
+  z-index:2;
+}
+#container{
+  position:absolute;
+  width:100%;
+  height:100%;
+  z-index:0;
+  visibility:hidden;
+}
+#bar_graph div{
+  height:15%;
+  margin-bottom:0.5em;
+  box-sizing: border-box;
+  padding-left:1em;
+  color:black;
+  padding-top:1em;
+}
+#bar_graph span{
+  display:inline-block;
+}
+
+a:link {
+    color:white;
+    text-decoration: none;
+}
+
+a:visited {
+    color:white;
+    text-decoration: none;
+}
+
+a:hover {
+    color:white;
+    text-decoration: none;
+}
+
+a:active {
+    color:white;
+    text-decoration: none;
+}
