@@ -10,4 +10,10 @@ The data is outputed on the following topics:
 - /HarkSource : the position of the different sources
 - /HarkSrcWave : the separated audio with its source direction
 
+Settings
+locmusic min deg = -90
+locmusic max deg = 90
+locmusic num source = 2
+source tracker thresh = 38
+
 ## Use
