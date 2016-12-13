@@ -142,9 +142,7 @@ class StartTopic(smach.State):
 
     def introSequence(self):
         rospy.loginfo('*Intro Sequence*')
-        goal = responseGoal(keywords=["intro"])
-        self.client.send_goal(goal)
-        self.client.wait_for_result()
+        self.client.send_goal(keywords=["intro"], name="", direction=0.0)
 
 
 # define state Mediate
@@ -170,9 +168,7 @@ class Mediate(smach.State):
             self.initTimer()
         while not rospy.is_shutdown():
             if (self.timerStart - rospy.Time.now()) < 10:
-                goal = responseGoal(keywords=["nearly_done"])
-                self.client.send_goal(goal)
-                self.client.wait_for_result()
+                self.client.send_goal(keywords=["nearly_done"], direction=0.0, name="")
             elif self.timeup is True:
                 # time run out
                 return 'timeup'
@@ -183,10 +179,10 @@ class Mediate(smach.State):
                 # too many speakers
                 return 'control_conv'
 
-        def initTimer(self):
-            rospy.Timer(rospy.Duration(self.duration), self.callback, oneshot=True)
-            self.init = True
-            self.timerStart = rospy.Time.now()
+    def initTimer(self):
+        rospy.Timer(rospy.Duration(self.duration), self.callback, oneshot=True)
+        self.init = True
+        self.timerStart = rospy.Time.now()
 
     def callback(self, event):
         rospy.loginfo('Time is up: ' + str(event.current_real))
@@ -208,13 +204,8 @@ class Quieten(smach.State):
     def execute(self, userdata):
         rospy.loginfo('Executing state Quieten')
         # Ask to be quiet with nao
-        goal = responseGoal(keywords=["polite", "multiple"])
-        self.client.send_goal(goal)
-        self.client.wait_for_result()
-        if self.speakerStates.getNumActiveSpeakers() <= 1:
-            return 'success'
-        else:
-            return 'failed'
+        self.client.req(keywords=["polite", "multiple"], name="", direction=0.0)
+        return 'success' if self.speakerStates.getNumActiveSpeakers() <= 1 else 'failed'
 
 
 # define state Happy
@@ -230,9 +221,7 @@ class Happy(smach.State):
 
     def execute(self, userdata):
         rospy.loginfo('Executing state Happy')
-        goal = responseGoal(keywords=["thanks"])
-        self.client.send_goal(goal)
-        self.client.wait_for_result()
+        self.client.req(keywords=["thanks"], name="", direction=0.0)
         return 'success'
 
 
@@ -252,8 +241,8 @@ class AskQuestion(smach.State):
         # direct question at person
         goal = responseGoal(keywords=["select_other"], name=self.speakerStates.getNextTooShortSpeaker().label,
                             direction=self.speakerStates.getNextTooShortSpeaker().azimuth)
-        self.client.send_goal(goal)
-        self.client.wait_for_result()
+        self.client.req(keywords=["select_other"], name=self.speakerStates.getNextTooShortSpeaker().label,
+                            direction=self.speakerStates.getNextTooShortSpeaker().azimuth)
         return 'success'
 
 
@@ -271,9 +260,7 @@ class CloseTopic(smach.State):
     def execute(self, userdata):
         rospy.loginfo('Executing state CloseTopic')
         rospy.sleep(1)
-        goal = responseGoal(keywords=["outro"])
-        self.client.send_goal(goal)
-        self.client.wait_for_result()
+        self.client.req(keywords=["outro"], name="", direction=0.0)
         return 'finished'
 
 
