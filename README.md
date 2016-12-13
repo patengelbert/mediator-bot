@@ -56,6 +56,8 @@ git stash pop
 
 [Design Report](https://www.overleaf.com/6835404kgznhmrnwdwq)
 
+[Final Report](https://www.overleaf.com/7427603bmmydhjfsxxn)
+
 ## System
 
 ![System Overview](https://github.com/patengelbert/mediator-bot/raw/master/images/System Overview.png?raw=true)

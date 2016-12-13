@@ -1,7 +1,7 @@
 # Define the goal
-string action  # Specify the type of action and response to run
+string[] keywords  # Specify the type of action and response to run
 string name    # Name of the person to direct the action at
-int32 direction    # Direction of person's location (-90 to +90 degrees)
+float32 direction    # Direction of person's location (-90 to +90 degrees)
 ---
 # Define the result
 bool done
