@@ -35,10 +35,11 @@ from actions import (
     LookAtSpeaker,
     StopDidISAskYouResponse,
     StopMultipleResponseNamed,
-IntroOutroMovement,
-IntroResponse,
-OutroResponse,
-NearlyDoneResponse,
+    IntroOutroMovement,
+    IntroResponse,
+    OutroResponse,
+    NearlyDoneResponse,
+    ThankYouResponse,
 )
 
 # NAO IP address and port
@@ -70,10 +71,11 @@ actionsToAdd = {
     LookAtSpeaker,
     StopDidISAskYouResponse,
     StopMultipleResponseNamed,
-IntroOutroMovement,
-IntroResponse,
-OutroResponse,
-NearlyDoneResponse,
+    IntroOutroMovement,
+    IntroResponse,
+    OutroResponse,
+    NearlyDoneResponse,
+    ThankYouResponse,
 }
 
 if not ALLOW_ANGRY_ACTIONS:
@@ -196,7 +198,7 @@ class ResponseServer:
             dir = goal.direction if goal.direction is not None else 0.0
             m.run(max(min(dir, 90.0), -90.0))
         if r is not None:
-            name = goal.name if goal.name is not None else ""
+            name = goal.name if goal.name is not None else "You"
             r.run(changeName(name))
 
         self.bm.runBehavior("actions-67d9a5/Return")

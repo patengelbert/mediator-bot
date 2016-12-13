@@ -83,6 +83,13 @@ class StopThanksResponse(ResponseAction):
         self.textToSpeechProxy.say("Thank you for your contribution {}".format(name))
 
 
+class ThankYouResponse(ResponseAction):
+    keywords = {"thanks"}
+
+    def _response(self, name):
+        self.textToSpeechProxy.say("Thank you")
+
+
 class StartAnyoneMovement(MovementAction):
     keywords = {"anyone", "select_other", "polite"}
 
