@@ -39,7 +39,7 @@ StopShhResponse,
 StopMultipleResponse,
 StopMultipleMovement,
 StopMultipleResponse2,
-Natural,
+LookAtSpeaker,
 )
 
 # NAO IP address and port
@@ -68,7 +68,7 @@ actionsToAdd = [
 StopMultipleMovement,
 StopMultipleResponse,
 StopMultipleResponse2,
-Natural,
+LookAtSpeaker,
 ]
 
 
@@ -159,6 +159,8 @@ class ResponseServer:
 
         self.addActions()
 
+        self.bm.startBehavior("actions-67d9a5/Breathe")
+
         self.server.start()
 
     def addActions(self):
@@ -166,10 +168,13 @@ class ResponseServer:
             actionLibrary.addAction(action(self.mp, self.tts, self.bm))
 
     def shutdown(self):
+        if hasattr(self, 'bm') and self.bm is not None:
+            self.bm.stopAllBehaviors()
         if hasattr(self, 'mp') and self.mp is not None:
             self.mp.rest()
 
     def execute(self, goal):
+        self.bm.stopAllBehaviors()
         kw = goal.keywords
         m = actionLibrary.getMovementAction(kw)
         r = actionLibrary.getResponseAction(kw)
@@ -179,6 +184,7 @@ class ResponseServer:
             r.run(goal.name)
 
         self.bm.runBehavior("actions-67d9a5/Return")
+        self.bm.startBehavior("actions-67d9a5/Breathe")
 
         self.server.set_succeeded()
 

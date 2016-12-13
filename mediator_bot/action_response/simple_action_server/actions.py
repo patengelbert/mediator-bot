@@ -1,5 +1,6 @@
 import math
 import rospy
+import time
 
 import stopLeft
 import stopRight
@@ -14,6 +15,7 @@ def lookAtDirection(movementProxy, direction):
 
 
 class Action(object):
+    actionKeyWord = ""
     keywords = set()
 
     def __init__(self, movementProxy, textToSpeechProxy, behaviourManagerProxy, keywords=None):
@@ -42,7 +44,6 @@ class ResponseAction(Action):
 
 class MovementAction(Action):
     def run(self, direction):
-        self.behaviourManagerProxy.stopAllBehaviors()
         rospy.loginfo("Movement: {:s} to {}".format(self, direction))
         self._movement(direction)
 
@@ -217,11 +218,10 @@ class StopMultipleResponse2(ResponseAction):
     def _response(self, name):
         self.textToSpeechProxy.say("Please, one person at a time")
 
-
-class Natural(MovementAction):
-    keywords = {"natural"}
+class LookAtSpeaker(MovementAction):
+    keywords = {"look", "natural"}
 
     def _movement(self, direction):
         direction = math.radians(direction)
-        lookAtDirection(self.movementProxy, direction)
-        self.behaviourManagerProxy.runBehavior("actions-67d9a5/Breathe")
+        self.movementProxy.setAngles("HeadYaw", direction, 0.3)
+        time.sleep(1)
