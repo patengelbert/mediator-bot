@@ -40,6 +40,7 @@ from actions import (
     OutroResponse,
     NearlyDoneResponse,
     ThankYouResponse,
+    ThankYouResponseNamed,
 )
 
 # NAO IP address and port
@@ -76,6 +77,7 @@ actionsToAdd = {
     OutroResponse,
     NearlyDoneResponse,
     ThankYouResponse,
+    ThankYouResponseNamed,
 }
 
 if not ALLOW_ANGRY_ACTIONS:
