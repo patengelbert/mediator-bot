@@ -54,15 +54,15 @@ class SpeakerStates:
         return [s for s in self.speakers.itervalues() if s.status == Status.TOO_SHORT]
 
     def getNextTooShortSpeaker(self):
-	s = self.getTooShortSpeakers()
-	if len(s) == 0:
-		return None
+        s = self.getTooShortSpeakers()
+        if len(s) == 0:
+            return None
         return random.choice(s)
 
     def getNextTooLongSpeaker(self):
-	s = self.getTooLongSpeakers()
-	if len(s) == 0:
-		return None
+        s = self.getTooLongSpeakers()
+        if len(s) == 0:
+            return None
         return random.choice(s)
 
     def getActiveSpeakers(self):
@@ -95,54 +95,69 @@ class ActionClient(object):
 
 running = False
 
+class State(smach.State):
 
-# States #
-
-# define state Initialise
-class Initialise(smach.State):
-    """
-    Initialise the module and wait to start.
-    """
+    outcomes = []
 
     def __init__(self, speakerStates, client):
         self.speakerStates = speakerStates
         self.client = client
-        smach.State.__init__(self, outcomes=['initialised', 'preempted'])
+        smach.State.__init__(self, outcomes=self.outcomes + ['errored', 'preempted'])
 
     def execute(self, userdata):
-        # get names from topic, added user
-        rospy.loginfo('Executing state Initialise')
-        rospy.loginfo('Waiting for registered users...')
-        while not self.speakerStates.speakers:  # wait while there are no registered
-            if self.preempt_requested():
-                self.service_preempt()
-                return 'preempted'
-            rospy.sleep(1)
-        rospy.loginfo('Users registered')
-        while not running:
-            rospy.sleep(0.5)
-        return 'initialised'
+        try:
+            rospy.loginfo("Executing state {:s}".format(self))
+            return self._execute(userdata)
+        except Exception as e:
+            rospy.logerr(e)
+            return 'errored'
+
+    def _execute(self, userdata):
+        raise NotImplementedError
 
     def request_preempt(self):
         """Overload the preempt request method just to spew an error."""
         smach.State.request_preempt(self)
         rospy.logwarn("Preempted!")
 
+    def checkPreemption(self):
+        if self.preempt_requested():
+            self.service_preempt()
+            return 'preempted'
+
+    def __str__(self):
+        return self.__class__.__name__
+
+
+# States #
+
+# define state Initialise
+class Initialise(State):
+    """
+    Initialise the module and wait to start.
+    """
+
+    outcomes = ['initialised']
+
+    def _execute(self, userdata):
+        # get names from topic, added user
+        rospy.loginfo('Waiting for registered users...')
+        while not self.speakerStates.speakers and not running:  # wait while there are no registered
+            self.checkPreemption()
+            rospy.sleep(0.5)
+        rospy.loginfo('Users registered')
+        return 'initialised'
+
 
 # define state Start
-class StartTopic(smach.State):
+class StartTopic(State):
     """
     Start the current topic
     """
 
-    def __init__(self, speakerStates, client):
-        self.speakerStates = speakerStates
-        self.client = client
-        smach.State.__init__(self, outcomes=['intro_complete'])
+    outcomes = ['intro_complete']
 
-    def execute(self, userdata):
-        rospy.loginfo('Executing state Start')
-        rospy.sleep(1)
+    def _execute(self, userdata):
         self.introSequence()
         return 'intro_complete'
 
@@ -152,24 +167,24 @@ class StartTopic(smach.State):
 
 
 # define state Mediate
-class Mediate(smach.State):
+class Mediate(State):
     """
     Main state mediating the conversation. Constantly checking the state of
     the conversation in order to give a appropriate response.
     """
 
+    outcomes = ['timeup', 'control_conv', 'not_speaking']
+
     def __init__(self, speakerStates, client):
-        self.speakerStates = speakerStates
-        self.client = client
-        smach.State.__init__(self, outcomes=['timeup', 'control_conv', 'not_speaking'])
+        super(Mediate, self).__init__(speakerStates, client)
         self.timeup = False
         self.init = False
         self.duration = 500
         self.timerStart = 0
 
-    def execute(self, userdata):
-        rospy.loginfo('Executing state Mediate')
+    def _execute(self, userdata):
         rospy.sleep(3)
+        self.checkPreemption()
         if not self.init:
             self.initTimer()
         while not rospy.is_shutdown():
@@ -196,76 +211,61 @@ class Mediate(smach.State):
 
 
 # define state Quieten
-class Quieten(smach.State):
+class Quieten(State):
     """
     Too many people are currently talking. Attempt to return to a single
     speaker.
     """
+    outcomes = ['success', 'failed']
 
-    def __init__(self, speakerStates, client):
-        self.speakerStates = speakerStates
-        self.client = client
-        smach.State.__init__(self, outcomes=['success', 'failed'])
-
-    def execute(self, userdata):
-        rospy.loginfo('Executing state Quieten')
+    def _execute(self, userdata):
         # Ask to be quiet with nao
         self.client.req(keywords=["polite", "multiple"], name="", direction=0.0)
         return 'success' if self.speakerStates.getNumActiveSpeakers() <= 1 else 'failed'
 
 
 # define state Happy
-class Happy(smach.State):
+class Happy(State):
     """
     Show the previous action was successful.
     """
 
-    def __init__(self, speakerStates, client):
-        self.speakerStates = speakerStates
-        self.client = client
-        smach.State.__init__(self, outcomes=['success'])
+    outcomes = ['success']
 
-    def execute(self, userdata):
+    def _execute(self, userdata):
         rospy.loginfo('Executing state Happy')
         self.client.req(keywords=["thanks"], name="", direction=0.0)
         return 'success'
 
 
 # define state AskQuestion
-class AskQuestion(smach.State):
+class AskQuestion(State):
     """
     Ask least talkative person a question if someone talking too much.
     """
 
-    def __init__(self, speakerStates, client):
-        self.speakerStates = speakerStates
-        self.client = client
-        smach.State.__init__(self, outcomes=['success'])
+    outcomes = ['success']
 
-    def execute(self, userdata):
-        rospy.loginfo('Executing state AskQuestion')
+    def _execute(self, userdata):
         # direct question at person
-        goal = responseGoal(keywords=["select_other"], name=self.speakerStates.getNextTooShortSpeaker().label,
-                            direction=self.speakerStates.getNextTooShortSpeaker().azimuth)
-        self.client.req(keywords=["select_other"], name=self.speakerStates.getNextTooShortSpeaker().label,
-                            direction=self.speakerStates.getNextTooShortSpeaker().azimuth)
+        speaker = self.speakerStates.getNextTooLongSpeaker()
+        if speaker is not None:
+            self.client.req(keywords=["stop"], name=speaker.label,
+                            direction=speaker.azimuth)
         return 'success'
 
 
 # define state Start
-class CloseTopic(smach.State):
+class CloseTopic(State):
     """
     Wrap up the current topic.
     """
 
-    def __init__(self, speakerStates, client):
-        self.speakerStates = speakerStates
-        self.client = client
-        smach.State.__init__(self, outcomes=['finished', 'next_topic'])
+    outcomes = ['finished', 'next_topic']
 
-    def execute(self, userdata):
-        rospy.loginfo('Executing state CloseTopic')
+    def _execute(self, userdata):
         rospy.sleep(1)
+        self.checkPreemption()
         self.client.req(keywords=["outro"], name="", direction=0.0)
         return 'finished'
 
