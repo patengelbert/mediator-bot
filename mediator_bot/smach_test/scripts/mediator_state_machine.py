@@ -54,7 +54,6 @@ class SpeakerStates:
         self.speakers[data.name] = Speaker(data.name)
 
     def updateSpeaker(self, data):
-        rospy.logdebug("Updating speaker {} -> {}".format(data.name, Status(data.status)))
         speaker = self.speakers.get(data.name, None)
         if speaker is None:
             self.addNewSpeaker(data)
@@ -95,6 +94,15 @@ class SpeakerStates:
     def getHighestWeightedSpeaker(self):
         l = sorted(self.speakers.values(), key=lambda x: x.weight, reverse=True)
         return l[0] if len(l) > 0 else None
+
+    def getTooLongActiveSpeakers(self):
+	return [s for s in self.speakers.itervalues() if s.speaking and s.status == Status.TOO_LONG and s.allowed]
+
+    def getNextTooLongActiveSpeaker(self):
+        l = self.getTooLongActiveSpeakers()
+        if len(l) == 0:
+             return None
+        return random.choice(l)
 
 
 class ActionClient(object):
@@ -193,7 +201,7 @@ class LookAtSpeaker(State):
     def _execute(self, userdata):
         s = None
 
-        action = self.checkNoImportantActions()
+        action = self.checkNoImportantActions(userdata)
 
         if action is not None:
             return action
@@ -217,9 +225,10 @@ class LookAtSpeaker(State):
 
         return 'finished'
 
-    def checkNoImportantActions(self):
-        tooLong = self.speakerStates.getNextTooLongSpeaker()
+    def checkNoImportantActions(self, userData):
+        tooLong = self.speakerStates.getNextTooLongActiveSpeaker()
         if tooLong is not None:
+            userData.name = tooLong.label
             return 'quieten'
 
         return None
@@ -283,7 +292,7 @@ class Quieten(State):
         speaker = self.speakerStates.speakers[userdata.name]
         # Ask to be quiet with nao
         extraKey = [] if random.random() < 0.6 else ["directed"] # Maybe force directed
-        self.client.req(keywords=["stop"] + extraKey, name=speaker.name, direction=speaker.azimuth)
+        self.client.req(keywords=["stop"] + extraKey, name=speaker.label, direction=speaker.azimuth)
 
         return 'success'
 
@@ -294,13 +303,17 @@ class Happy(State):
     """
 
     outcomes = ['success']
-    input_keys = ['name']
+    input_data = ['name']
 
     def _execute(self, userdata):
+        rospy.sleep(2)
+        if random.random() < 0.5:
+	    return 'success'
+
         speaker = self.speakerStates.speakers[userdata.name]
         rospy.sleep(1)
-        if not speaker.active:
-            self.client.req(keywords=["thanks"], name=speaker.name, direction=speaker.azimuth)
+        if not speaker.speaking:
+            self.client.req(keywords=["thanks"], name=speaker.label, direction=speaker.azimuth)
         return 'success'
 
 
@@ -351,8 +364,7 @@ def main():
     rospy.init_node('mediatorbot_state_machine', log_level=rospy.DEBUG)
 
     speakerStates = SpeakerStates()
-    # actionclient = ActionClient()
-    actionclient = None
+    actionclient = ActionClient()
     rospy.Subscriber("start_recognition", StartRecognitionMsg, started)
     rospy.Subscriber("/added_user", AddedUser, speakerStates.addNewSpeaker)
     rospy.Subscriber("/speaker_change_state", MedBotSpeechStatus,
@@ -373,7 +385,8 @@ def main():
                                             'quieten': 'Quieten',
                                             'question': 'LookAtSpeaker',
                                             'group_question': 'LookAtSpeaker',
-                                            'group_quieten': 'LookAtSpeaker'})
+                                            'group_quieten': 'LookAtSpeaker'},
+remapping={'name': 'sm_name'})
         smach.StateMachine.add('StartTopic', StartTopic(speakerStates, actionclient),
                                transitions={'intro_complete': 'LookAtSpeaker',
                                             'preempted': 'preempted',
@@ -386,11 +399,13 @@ def main():
         smach.StateMachine.add('Quieten', Quieten(speakerStates, actionclient),
                                transitions={'success': 'Happy',
                                             'preempted': 'preempted',
-                                            'errored': 'errored'})
+                                            'errored': 'errored'},
+remapping={'name': 'sm_name'})
         smach.StateMachine.add('Happy', Happy(speakerStates, actionclient),
                                transitions={'success': 'LookAtSpeaker',
                                             'preempted': 'preempted',
-                                            'errored': 'errored'})
+                                            'errored': 'errored'},
+remapping={'name': 'sm_name'})
         # smach.StateMachine.add('AskQuestion', AskQuestion(speakerStates, actionclient),
         #                        transitions={'success': 'Mediate',
         #                                     'preempted': 'preempted',
