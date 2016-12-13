@@ -65,7 +65,7 @@ class SpeakerContainer(object):
     @status.setter
     def status(self, val):
         if self._status != val:
-            self.sendMessage()
+            self.sendMessage(val)
             rospy.logdebug("{}: Setting status - {}".format(self.label, val))
         self._status = val
 
@@ -84,13 +84,13 @@ class SpeakerContainer(object):
         else:
             self.status = Status.NO_STATUS
 
-    def sendMessage(self):
+    def sendMessage(self, status):
         msg = MedBotSpeechStatus()
         msg.header = rospy.Header()
         msg.header.stamp = rospy.Time.now()
         msg.weight = self.weight
         msg.name = self.label
-        msg.status = self.status.value
+        msg.status = status.value
         msg.speaking = self.speaking
         if len(self.azimuths) == 0:
             msg.azimuth = 0
