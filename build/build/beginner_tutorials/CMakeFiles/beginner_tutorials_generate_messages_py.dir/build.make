@@ -45,39 +45,89 @@ CMAKE_BINARY_DIR = /home/becks/mediator-bot/build/build
 # Include the progress variables for this target.
 include beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/progress.make
 
-beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Num.py
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Percentage.py
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Action.py
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Person_Setup.py
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Transcript.py
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Person_Register.py
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/_StartEnrollment.py
 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/_AddTwoInts.py
 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.py
 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.py
 
-/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Num.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py
-/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Num.py: /home/becks/mediator-bot/build/src/beginner_tutorials/msg/Num.msg
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Percentage.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Percentage.py: /home/becks/mediator-bot/build/src/beginner_tutorials/msg/Percentage.msg
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles $(CMAKE_PROGRESS_1)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python from MSG beginner_tutorials/Num"
-	cd /home/becks/mediator-bot/build/build/beginner_tutorials && ../catkin_generated/env_cached.sh /home/becks/mediator-bot/env/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/becks/mediator-bot/build/src/beginner_tutorials/msg/Num.msg -Ibeginner_tutorials:/home/becks/mediator-bot/build/src/beginner_tutorials/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p beginner_tutorials -o /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python from MSG beginner_tutorials/Percentage"
+	cd /home/becks/mediator-bot/build/build/beginner_tutorials && ../catkin_generated/env_cached.sh /home/becks/mediator-bot/env/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/becks/mediator-bot/build/src/beginner_tutorials/msg/Percentage.msg -Ibeginner_tutorials:/home/becks/mediator-bot/build/src/beginner_tutorials/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p beginner_tutorials -o /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg
+
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Action.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Action.py: /home/becks/mediator-bot/build/src/beginner_tutorials/msg/Action.msg
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles $(CMAKE_PROGRESS_2)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python from MSG beginner_tutorials/Action"
+	cd /home/becks/mediator-bot/build/build/beginner_tutorials && ../catkin_generated/env_cached.sh /home/becks/mediator-bot/env/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/becks/mediator-bot/build/src/beginner_tutorials/msg/Action.msg -Ibeginner_tutorials:/home/becks/mediator-bot/build/src/beginner_tutorials/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p beginner_tutorials -o /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg
+
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Person_Setup.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Person_Setup.py: /home/becks/mediator-bot/build/src/beginner_tutorials/msg/Person_Setup.msg
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles $(CMAKE_PROGRESS_3)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python from MSG beginner_tutorials/Person_Setup"
+	cd /home/becks/mediator-bot/build/build/beginner_tutorials && ../catkin_generated/env_cached.sh /home/becks/mediator-bot/env/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/becks/mediator-bot/build/src/beginner_tutorials/msg/Person_Setup.msg -Ibeginner_tutorials:/home/becks/mediator-bot/build/src/beginner_tutorials/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p beginner_tutorials -o /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg
+
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Transcript.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Transcript.py: /home/becks/mediator-bot/build/src/beginner_tutorials/msg/Transcript.msg
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles $(CMAKE_PROGRESS_4)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python from MSG beginner_tutorials/Transcript"
+	cd /home/becks/mediator-bot/build/build/beginner_tutorials && ../catkin_generated/env_cached.sh /home/becks/mediator-bot/env/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/becks/mediator-bot/build/src/beginner_tutorials/msg/Transcript.msg -Ibeginner_tutorials:/home/becks/mediator-bot/build/src/beginner_tutorials/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p beginner_tutorials -o /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg
+
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Person_Register.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Person_Register.py: /home/becks/mediator-bot/build/src/beginner_tutorials/msg/Person_Register.msg
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles $(CMAKE_PROGRESS_5)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python from MSG beginner_tutorials/Person_Register"
+	cd /home/becks/mediator-bot/build/build/beginner_tutorials && ../catkin_generated/env_cached.sh /home/becks/mediator-bot/env/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py /home/becks/mediator-bot/build/src/beginner_tutorials/msg/Person_Register.msg -Ibeginner_tutorials:/home/becks/mediator-bot/build/src/beginner_tutorials/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p beginner_tutorials -o /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg
+
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/_StartEnrollment.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/gensrv_py.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/_StartEnrollment.py: /home/becks/mediator-bot/build/src/beginner_tutorials/srv/StartEnrollment.srv
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles $(CMAKE_PROGRESS_6)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python code from SRV beginner_tutorials/StartEnrollment"
+	cd /home/becks/mediator-bot/build/build/beginner_tutorials && ../catkin_generated/env_cached.sh /home/becks/mediator-bot/env/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/gensrv_py.py /home/becks/mediator-bot/build/src/beginner_tutorials/srv/StartEnrollment.srv -Ibeginner_tutorials:/home/becks/mediator-bot/build/src/beginner_tutorials/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p beginner_tutorials -o /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv
 
 /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/_AddTwoInts.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/gensrv_py.py
 /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/_AddTwoInts.py: /home/becks/mediator-bot/build/src/beginner_tutorials/srv/AddTwoInts.srv
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles $(CMAKE_PROGRESS_2)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles $(CMAKE_PROGRESS_7)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python code from SRV beginner_tutorials/AddTwoInts"
 	cd /home/becks/mediator-bot/build/build/beginner_tutorials && ../catkin_generated/env_cached.sh /home/becks/mediator-bot/env/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/gensrv_py.py /home/becks/mediator-bot/build/src/beginner_tutorials/srv/AddTwoInts.srv -Ibeginner_tutorials:/home/becks/mediator-bot/build/src/beginner_tutorials/msg -Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg -p beginner_tutorials -o /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv
 
 /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py
-/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Num.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Percentage.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Action.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Person_Setup.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Transcript.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Person_Register.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/_StartEnrollment.py
 /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/_AddTwoInts.py
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles $(CMAKE_PROGRESS_3)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles $(CMAKE_PROGRESS_8)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python msg __init__.py for beginner_tutorials"
 	cd /home/becks/mediator-bot/build/build/beginner_tutorials && ../catkin_generated/env_cached.sh /home/becks/mediator-bot/env/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py -o /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg --initpy
 
 /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.py: /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py
-/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Num.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Percentage.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Action.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Person_Setup.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Transcript.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Person_Register.py
+/home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/_StartEnrollment.py
 /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/_AddTwoInts.py
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles $(CMAKE_PROGRESS_4)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles $(CMAKE_PROGRESS_9)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating Python srv __init__.py for beginner_tutorials"
 	cd /home/becks/mediator-bot/build/build/beginner_tutorials && ../catkin_generated/env_cached.sh /home/becks/mediator-bot/env/bin/python /opt/ros/indigo/share/genpy/cmake/../../../lib/genpy/genmsg_py.py -o /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv --initpy
 
 beginner_tutorials_generate_messages_py: beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py
-beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Num.py
+beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Percentage.py
+beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Action.py
+beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Person_Setup.py
+beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Transcript.py
+beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/_Person_Register.py
+beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/_StartEnrollment.py
 beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/_AddTwoInts.py
 beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/msg/__init__.py
 beginner_tutorials_generate_messages_py: /home/becks/mediator-bot/build/devel/lib/python2.7/dist-packages/beginner_tutorials/srv/__init__.py

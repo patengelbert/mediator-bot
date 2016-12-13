@@ -1,2 +1,2 @@
-set(beginner_tutorials_MESSAGE_FILES "/home/becks/mediator-bot/build/src/beginner_tutorials/msg/Num.msg")
-set(beginner_tutorials_SERVICE_FILES "/home/becks/mediator-bot/build/src/beginner_tutorials/srv/AddTwoInts.srv")
+set(beginner_tutorials_MESSAGE_FILES "/home/becks/mediator-bot/build/src/beginner_tutorials/msg/Action.msg;/home/becks/mediator-bot/build/src/beginner_tutorials/msg/Percentage.msg;/home/becks/mediator-bot/build/src/beginner_tutorials/msg/Person_Register.msg;/home/becks/mediator-bot/build/src/beginner_tutorials/msg/Person_Setup.msg;/home/becks/mediator-bot/build/src/beginner_tutorials/msg/Transcript.msg")
+set(beginner_tutorials_SERVICE_FILES "/home/becks/mediator-bot/build/src/beginner_tutorials/srv/AddTwoInts.srv;/home/becks/mediator-bot/build/src/beginner_tutorials/srv/StartEnrollment.srv")

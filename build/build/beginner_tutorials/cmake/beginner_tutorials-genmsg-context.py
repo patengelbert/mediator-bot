@@ -1,7 +1,7 @@
 # generated from genmsg/cmake/pkg-genmsg.context.in
 
-messages_str = "/home/becks/mediator-bot/build/src/beginner_tutorials/msg/Num.msg"
-services_str = "/home/becks/mediator-bot/build/src/beginner_tutorials/srv/AddTwoInts.srv"
+messages_str = "/home/becks/mediator-bot/build/src/beginner_tutorials/msg/Action.msg;/home/becks/mediator-bot/build/src/beginner_tutorials/msg/Percentage.msg;/home/becks/mediator-bot/build/src/beginner_tutorials/msg/Person_Register.msg;/home/becks/mediator-bot/build/src/beginner_tutorials/msg/Person_Setup.msg;/home/becks/mediator-bot/build/src/beginner_tutorials/msg/Transcript.msg"
+services_str = "/home/becks/mediator-bot/build/src/beginner_tutorials/srv/AddTwoInts.srv;/home/becks/mediator-bot/build/src/beginner_tutorials/srv/StartEnrollment.srv"
 pkg_name = "beginner_tutorials"
 dependencies_str = "std_msgs"
 langs = "gencpp;genlisp;genpy"

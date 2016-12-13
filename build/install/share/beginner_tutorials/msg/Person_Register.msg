@@ -1,0 +1,2 @@
+string Person
+bool Success

@@ -230,7 +230,7 @@ gtest/preinstall:
 gtest/CMakeFiles/gtest.dir/all:
 	$(MAKE) -f gtest/CMakeFiles/gtest.dir/build.make gtest/CMakeFiles/gtest.dir/depend
 	$(MAKE) -f gtest/CMakeFiles/gtest.dir/build.make gtest/CMakeFiles/gtest.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles  9
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles  24
 	@echo "Built target gtest"
 .PHONY : gtest/CMakeFiles/gtest.dir/all
 
@@ -261,7 +261,7 @@ clean: gtest/CMakeFiles/gtest.dir/clean
 gtest/CMakeFiles/gtest_main.dir/all: gtest/CMakeFiles/gtest.dir/all
 	$(MAKE) -f gtest/CMakeFiles/gtest_main.dir/build.make gtest/CMakeFiles/gtest_main.dir/depend
 	$(MAKE) -f gtest/CMakeFiles/gtest_main.dir/build.make gtest/CMakeFiles/gtest_main.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles  10
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles  25
 	@echo "Built target gtest_main"
 .PHONY : gtest/CMakeFiles/gtest_main.dir/all
 
@@ -293,8 +293,13 @@ beginner_tutorials/all: beginner_tutorials/CMakeFiles/beginner_tutorials_generat
 .PHONY : beginner_tutorials/all
 
 # Convenience name for "clean" pass in the directory.
+beginner_tutorials/clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/clean
 beginner_tutorials/clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_AddTwoInts.dir/clean
-beginner_tutorials/clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/clean
+beginner_tutorials/clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/clean
+beginner_tutorials/clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/clean
+beginner_tutorials/clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/clean
+beginner_tutorials/clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/clean
+beginner_tutorials/clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/clean
 beginner_tutorials/clean: beginner_tutorials/CMakeFiles/beginner_tutorials_gencpp.dir/clean
 beginner_tutorials/clean: beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages.dir/clean
 beginner_tutorials/clean: beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/clean
@@ -316,6 +321,37 @@ beginner_tutorials/clean: beginner_tutorials/CMakeFiles/std_msgs_generate_messag
 # Convenience name for "preinstall" pass in the directory.
 beginner_tutorials/preinstall:
 .PHONY : beginner_tutorials/preinstall
+
+#=============================================================================
+# Target rules for target beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir
+
+# All Build rule for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/all:
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/depend
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles 
+	@echo "Built target _beginner_tutorials_generate_messages_check_deps_Action"
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/all
+
+# Build rule for subdir invocation for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
+	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/rule
+
+# Convenience name for target.
+_beginner_tutorials_generate_messages_check_deps_Action: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/rule
+.PHONY : _beginner_tutorials_generate_messages_check_deps_Action
+
+# clean rule for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/clean:
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/clean
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/clean
+
+# clean rule for target.
+clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/clean
+.PHONY : clean
 
 #=============================================================================
 # Target rules for target beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_AddTwoInts.dir
@@ -349,34 +385,158 @@ clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir
+# Target rules for target beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir
 
 # All Build rule for target.
-beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/all:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/depend
-	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/build
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/all:
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/depend
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/build
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles 
-	@echo "Built target _beginner_tutorials_generate_messages_check_deps_Num"
-.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/all
+	@echo "Built target _beginner_tutorials_generate_messages_check_deps_Percentage"
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/all
 
 # Build rule for subdir invocation for target.
-beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/rule: cmake_check_build_system
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
-	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/all
+	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
-.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/rule
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/rule
 
 # Convenience name for target.
-_beginner_tutorials_generate_messages_check_deps_Num: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/rule
-.PHONY : _beginner_tutorials_generate_messages_check_deps_Num
+_beginner_tutorials_generate_messages_check_deps_Percentage: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/rule
+.PHONY : _beginner_tutorials_generate_messages_check_deps_Percentage
 
 # clean rule for target.
-beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/clean:
-	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/clean
-.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/clean
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/clean:
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/clean
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/clean
 
 # clean rule for target.
-clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/clean
+clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/clean
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir
+
+# All Build rule for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/all:
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/depend
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles 
+	@echo "Built target _beginner_tutorials_generate_messages_check_deps_Person_Register"
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/all
+
+# Build rule for subdir invocation for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
+	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/rule
+
+# Convenience name for target.
+_beginner_tutorials_generate_messages_check_deps_Person_Register: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/rule
+.PHONY : _beginner_tutorials_generate_messages_check_deps_Person_Register
+
+# clean rule for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/clean:
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/clean
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/clean
+
+# clean rule for target.
+clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/clean
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir
+
+# All Build rule for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/all:
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/depend
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles 
+	@echo "Built target _beginner_tutorials_generate_messages_check_deps_Person_Setup"
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/all
+
+# Build rule for subdir invocation for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
+	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/rule
+
+# Convenience name for target.
+_beginner_tutorials_generate_messages_check_deps_Person_Setup: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/rule
+.PHONY : _beginner_tutorials_generate_messages_check_deps_Person_Setup
+
+# clean rule for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/clean:
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/clean
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/clean
+
+# clean rule for target.
+clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/clean
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir
+
+# All Build rule for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/all:
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/depend
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles 
+	@echo "Built target _beginner_tutorials_generate_messages_check_deps_StartEnrollment"
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/all
+
+# Build rule for subdir invocation for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
+	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/rule
+
+# Convenience name for target.
+_beginner_tutorials_generate_messages_check_deps_StartEnrollment: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/rule
+.PHONY : _beginner_tutorials_generate_messages_check_deps_StartEnrollment
+
+# clean rule for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/clean:
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/clean
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/clean
+
+# clean rule for target.
+clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/clean
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir
+
+# All Build rule for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/all:
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/depend
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles 
+	@echo "Built target _beginner_tutorials_generate_messages_check_deps_Transcript"
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/all
+
+# Build rule for subdir invocation for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
+	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/rule
+
+# Convenience name for target.
+_beginner_tutorials_generate_messages_check_deps_Transcript: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/rule
+.PHONY : _beginner_tutorials_generate_messages_check_deps_Transcript
+
+# clean rule for target.
+beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/clean:
+	$(MAKE) -f beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/build.make beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/clean
+.PHONY : beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/clean
+
+# clean rule for target.
+clean: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -392,7 +552,7 @@ beginner_tutorials/CMakeFiles/beginner_tutorials_gencpp.dir/all: beginner_tutori
 
 # Build rule for subdir invocation for target.
 beginner_tutorials/CMakeFiles/beginner_tutorials_gencpp.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 7
 	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/beginner_tutorials_gencpp.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
 .PHONY : beginner_tutorials/CMakeFiles/beginner_tutorials_gencpp.dir/rule
@@ -429,7 +589,7 @@ all: beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages.dir/all
 
 # Build rule for subdir invocation for target.
 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 23
 	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
 .PHONY : beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages.dir/rule
@@ -451,18 +611,23 @@ clean: beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages.dir/cl
 # Target rules for target beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir
 
 # All Build rule for target.
-beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/all
 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/all: beginner_tutorials/CMakeFiles/std_msgs_generate_messages_cpp.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/all
 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_AddTwoInts.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/all
 	$(MAKE) -f beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/build.make beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/depend
 	$(MAKE) -f beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/build.make beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles  1 2
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles  1 2 3 4 5 6 7
 	@echo "Built target beginner_tutorials_generate_messages_cpp"
 .PHONY : beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/all
 
 # Build rule for subdir invocation for target.
 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 7
 	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
 .PHONY : beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.dir/rule
@@ -484,18 +649,23 @@ clean: beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_cpp.di
 # Target rules for target beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir
 
 # All Build rule for target.
-beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/all
 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/all: beginner_tutorials/CMakeFiles/std_msgs_generate_messages_lisp.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/all
 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_AddTwoInts.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/all
 	$(MAKE) -f beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/build.make beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/depend
 	$(MAKE) -f beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/build.make beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles  3 4
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles  8 9 10 11 12 13 14
 	@echo "Built target beginner_tutorials_generate_messages_lisp"
 .PHONY : beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/all
 
 # Build rule for subdir invocation for target.
 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 7
 	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
 .PHONY : beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.dir/rule
@@ -517,18 +687,23 @@ clean: beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_lisp.d
 # Target rules for target beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir
 
 # All Build rule for target.
-beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Num.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Setup.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Person_Register.dir/all
 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/all: beginner_tutorials/CMakeFiles/std_msgs_generate_messages_py.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Action.dir/all
 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_AddTwoInts.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Transcript.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_Percentage.dir/all
+beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/all: beginner_tutorials/CMakeFiles/_beginner_tutorials_generate_messages_check_deps_StartEnrollment.dir/all
 	$(MAKE) -f beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/build.make beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/depend
 	$(MAKE) -f beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/build.make beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles  5 6 7 8
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/becks/mediator-bot/build/build/CMakeFiles  15 16 17 18 19 20 21 22 23
 	@echo "Built target beginner_tutorials_generate_messages_py"
 .PHONY : beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/all
 
 # Build rule for subdir invocation for target.
 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 9
 	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
 .PHONY : beginner_tutorials/CMakeFiles/beginner_tutorials_generate_messages_py.dir/rule
@@ -559,7 +734,7 @@ beginner_tutorials/CMakeFiles/beginner_tutorials_genlisp.dir/all: beginner_tutor
 
 # Build rule for subdir invocation for target.
 beginner_tutorials/CMakeFiles/beginner_tutorials_genlisp.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 7
 	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/beginner_tutorials_genlisp.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
 .PHONY : beginner_tutorials/CMakeFiles/beginner_tutorials_genlisp.dir/rule
@@ -590,7 +765,7 @@ beginner_tutorials/CMakeFiles/beginner_tutorials_genpy.dir/all: beginner_tutoria
 
 # Build rule for subdir invocation for target.
 beginner_tutorials/CMakeFiles/beginner_tutorials_genpy.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 9
 	$(MAKE) -f CMakeFiles/Makefile2 beginner_tutorials/CMakeFiles/beginner_tutorials_genpy.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/becks/mediator-bot/build/build/CMakeFiles 0
 .PHONY : beginner_tutorials/CMakeFiles/beginner_tutorials_genpy.dir/rule
