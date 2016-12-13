@@ -51,6 +51,8 @@ class SpeakerContainer(object):
         self.thresholdPos = thresholdPos
         self.thresholdNeg = thresholdNeg
 
+        self.azimuths = []
+
     @property
     def msg(self):
         # noinspection PyUnresolvedReferences
@@ -89,6 +91,7 @@ class SpeakerContainer(object):
         msg.weight = self.weight
         msg.status = self.status
         msg.speaking = self.speaking
+        msg.azimuth = reduce(lambda x, y: x + y, self.azimuths) / len(self.azimuths)
         self.pub.publish(msg)
 
 
@@ -111,6 +114,7 @@ class TimeAllocator:
             return
 
         speaker.speaking = data.active
+        speaker.azimuths.append(data.azimuth)
 
     def getSpeechStatus(self, req):
         speaker = self.speakers.get(req.name)

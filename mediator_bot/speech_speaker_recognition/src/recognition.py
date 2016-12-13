@@ -183,6 +183,7 @@ class Node(object):
             message.duration = stream.duration
             message.speaker = stream.speaker
             message.since_last_update = tNow - stream.lastUpdate
+            message.azimuth = reduce(lambda x, y: x + y, stream.azimuths) / len(stream.azimuths)
             stream.lastUpdate = tNow
 
         if publisher is not None:

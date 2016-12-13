@@ -66,6 +66,7 @@ class SrcStream(object):
         self.srcId = srcId
         self.data = []
         self.seqIds = []  # List of seqId, startSample, endSample
+        self.azimuths = []
         self.active = True
         self._transcript = None
         self.recogniser = speakerRecogniser
@@ -98,6 +99,7 @@ class SrcStream(object):
         else:
             with self.dataLock:
                 self.seqIds.append(seqId)
+                self.azimuths.append(src.azimuth)
                 self.data += src.wavedata
 
     def endStream(self, timeStamp):
