@@ -318,9 +318,10 @@ class Node(object):
 
         rospy.loginfo("Stopping")
 
-        fn = "models/{}_{}.bin".format('_'.join(self.recogniser.features.keys()), datetime.date.today())
-        rospy.loginfo("Saving model as {}".format(fn))
-        self.recogniser.dump(fn)
+        if self.numAdded > 0:
+            fn = "models/{}_{}.bin".format('_'.join(self.recogniser.features.keys()), datetime.date.today())
+            rospy.loginfo("Saving model as {}".format(fn))
+            self.recogniser.dump(fn)
 
 
 if __name__ == '__main__':
