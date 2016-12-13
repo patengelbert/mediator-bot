@@ -51,7 +51,7 @@ class SpeakerContainer(object):
         self.thresholdPos = thresholdPos
         self.thresholdNeg = thresholdNeg
 
-        self.azimuths = []
+        self.azimuth = 0.0
 
     @property
     def msg(self):
@@ -89,14 +89,9 @@ class SpeakerContainer(object):
         msg.header.stamp = rospy.Time.now()
         msg.weight = self.weight
         msg.name = self.label
-        msg.status = self.value
+        msg.status = self.status.value
         msg.speaking = self.speaking
-        if len(self.azimuths) == 0:
-            msg.azimuth = 0
-        elif len(self.azimuths) == 1:
-            msg.azimuth = self.azimuths[0]
-        else:
-            msg.azimuth = reduce(lambda x, y: x + y, [float(a) for a in self.azimuths]) / float(len(self.azimuths))
+	msg.azimuth = self.azimuth
         self.pub.publish(msg)
 
 
@@ -119,7 +114,7 @@ class TimeAllocator:
             return
 
         speaker.speaking = data.active
-        speaker.azimuths.append(data.azimuth)
+        speaker.azimuth = data.azimuth
 
     def getSpeechStatus(self, req):
         speaker = self.speakers.get(req.name)

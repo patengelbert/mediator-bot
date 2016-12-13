@@ -44,7 +44,7 @@ from actions import (
 
 # NAO IP address and port
 
-robotIP = "169.254.81.101"
+robotIP = "169.254.44.123"
 robotPort = 9559
 
 actionsToAdd = {

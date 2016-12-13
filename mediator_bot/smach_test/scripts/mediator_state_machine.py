@@ -112,7 +112,7 @@ class State(smach.State):
             return self._execute(userdata)
         except Exception as e:
             rospy.logerr(e)
-            return None  # Kill thread
+            return 'errored'
 
     def _execute(self, userdata):
         raise NotImplementedError
@@ -125,7 +125,7 @@ class State(smach.State):
     def checkPreemption(self):
         if self.preempt_requested():
             self.service_preempt()
-            return None  # Kill thread
+            return 'preempted'
 
     def __str__(self):
         return self.__class__.__name__
@@ -174,7 +174,7 @@ class LookAtSpeaker(State):
 
     def _execute(self, userdata):
         s = []
-        while not True:
+        while True:
             s = self.speakerStates.getActiveSpeakers()
             if len(s) > 0:
                 break
@@ -303,8 +303,8 @@ def main():
     rospy.init_node('mediatorbot_state_machine', log_level=rospy.DEBUG)
 
     speakerStates = SpeakerStates()
-    # actionclient = ActionClient()
-    actionclient = None
+    actionclient = ActionClient()
+
     rospy.Subscriber("start_recognition", StartRecognitionMsg, started)
     rospy.Subscriber("/added_user", AddedUser, speakerStates.addNewSpeaker)
     rospy.Subscriber("/speaker_change_state", MedBotSpeechStatus,
