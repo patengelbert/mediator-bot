@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   MedBotSpeechTiming.msg
+  MedBotSpeechStatus.msg
 )
 
 add_service_files(

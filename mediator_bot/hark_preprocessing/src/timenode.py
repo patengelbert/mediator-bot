@@ -5,7 +5,7 @@ import sys
 
 from enum import Enum
 from speech_speaker_recognition.msg import AddedUser, Speaker
-from mediator_bot_msgs.msg import MedBotSpeechTiming
+from mediator_bot_msgs.msg import MedBotSpeechTiming, MedBotSpeechStatus
 from mediator_bot_msgs.srv import MedBotSpeechQuery
 
 INC_FACTOR_POS = 2
@@ -144,7 +144,8 @@ class TimeAllocator:
         # Create subscribers/publishers
         rospy.Subscriber("added_user", AddedUser, self.userAdded)
         rospy.Subscriber("speaker", Speaker, self.callback)
-        self.pub = rospy.Publisher('/speaker_change_state', MedBotSpeechTiming, queue_size=10, latch=True)
+        self.pub = rospy.Publisher('/speaker_change_state', MedBotSpeechStatus, queue_size=10, latch=True)
+        self.pubWeight = rospy.Publisher('/speaker_weightings', MedBotSpeechTiming, queue_size=10, latch=True)
 
         rospy.Service('/query_speaker_state', MedBotSpeechQuery, self.getSpeechStatus)
 
@@ -194,6 +195,17 @@ class TimeAllocator:
         if self.debugLevel <= rospy.INFO:
             # Print out the current speech participation levels
             self.printMultProgress()
+
+        self.packMsg()
+
+    def packMsg(self):
+        msg = MedBotSpeechTiming()
+        msg.header = rospy.Header()
+        msg.header.stamp = rospy.Time().now()
+        msg.num_speakers = len(self.speakers)
+        msg.speaker_id = [s.label for s in self.speakers.itervalues()]
+        msg.weighting = [float(s.weight) for s in self.speakers.itervalues()]
+        self.pubWeight.publish(msg)
 
     def run(self):
         r = rospy.Rate(self.rate)

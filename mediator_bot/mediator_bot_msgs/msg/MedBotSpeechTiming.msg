@@ -1,5 +1,4 @@
 Header header
-string name
-float32 weight
-int32 status
-bool speaking
+float32 num_speakers
+string[] speaker_id # Name of the speaker
+float32[] weighting # Speakers recent contribution to the conversation

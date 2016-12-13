@@ -3,7 +3,7 @@ import rospy
 import smach
 import smach_ros
 from enum import Enum
-from mediator_bot_msgs.msg import MedBotSpeechTiming
+from mediator_bot_msgs.msg import MedBotSpeechStatus
 # TODO import other timing messages
 
 # Replace with import from timing node
@@ -194,7 +194,7 @@ def main():
     rospy.init_node('mediatorbot_state_machine')
 
     rospy.Subscriber("/speaker", MedBotSpeechTiming, callbackNewSpeaker)
-    rospy.Subscriber("/speaker_change_state", MedBotSpeechTiming, callbackSpeakerState) 
+    rospy.Subscriber("/speaker_change_state", MedBotSpeechStatus, callbackSpeakerState)
 
     # Create a SMACH state machine
     sm = smach.StateMachine(outcomes=['end'])
