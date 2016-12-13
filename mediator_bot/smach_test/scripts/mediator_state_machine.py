@@ -158,7 +158,7 @@ class Mediate(smach.State):
         smach.State.__init__(self, outcomes=['timeup', 'control_conv', 'not_speaking'])
         self.timeup = False
         self.init = False
-        self.duration = 60
+        self.duration = 500
         self.timerStart = 0
 
     def execute(self, userdata):
@@ -167,9 +167,9 @@ class Mediate(smach.State):
         if self.init is False:
             self.initTimer()
         while not rospy.is_shutdown():
-            if (self.timerStart - rospy.Time.now()) < 10:
+            if (rospy.Time.now() - self.timerStart) < rospy.Duration(10) and not self.timeup:
                 self.client.send_goal(keywords=["nearly_done"], direction=0.0, name="")
-            elif self.timeup is True:
+            elif self.timeup:
                 # time run out
                 return 'timeup'
             elif len(self.speakerStates.getTooLongSpeakers()) > 0:
