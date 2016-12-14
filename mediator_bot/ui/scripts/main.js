@@ -364,11 +364,13 @@ var percent_listener=new ROSLIB.Topic({
   name:'/Percentage',
   messageType:'ui/Percentage'
 });
+/*
 var register_listener=new ROSLIB.Topic({
   ros:ros,
   name:'/Registration_complete',
   messageType:'ui/Registration_Complete'
 });
+*/
 var transcript_listener=new ROSLIB.Topic({
   ros:ros,
   name:'/Transcript',
@@ -404,6 +406,7 @@ percent_listener.subscribe(function(message){
     }
   }
 });
+/*
 register_listener.subscribe(function(message){
   console.log(message.label + message.success);
   if(message.success){
@@ -411,6 +414,7 @@ register_listener.subscribe(function(message){
     ui.people[index]={person: message.label,percent:  0, x:0, y:0};
   }
 });
+*/
 //Publishing a topic
 //------------------------------------------
 var person_setup=new ROSLIB.Topic({
