@@ -117,7 +117,7 @@ test:
 run:
 	( \
 	. /opt/ros/$(ROS_DISTRO)/setup.sh ; \
-	roslaunch rosbridge+server rosbridge_websocket.launch
+	roslaunch rosbridge+server rosbridge_websocket.launch ; \
 	)
 
 docs:
