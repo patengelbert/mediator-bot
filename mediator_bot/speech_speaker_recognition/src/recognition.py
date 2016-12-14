@@ -158,40 +158,44 @@ class Node(object):
                                                  stream.transcription if stream.hasTranscription() else "<Unknown Transcript>"))
 
     def sendMessages(self, stream):
-        publisher = None
-        message = None
-        tNow = rospy.Time.now()
-        if stream.hasTranscription() and stream.hasKnownSpeaker():
-            publisher = self.transcriptionPublisher
-            # Send the final transcript message
-            message = SentenceTranscription()
-            message.sentence_id = stream.sentenceId
-            message.stream_id = stream.srcId
-            message.frame_ids = stream.seqIds
-            message.start = stream.start
-            message.end = stream.end
-            message.duration = stream.duration
-            message.speaker = stream.speaker
-            message.sentence = str(stream.transcription)
-        elif stream.hasKnownSpeaker():
-            publisher = self.speakerPublisher
-            # Send intermediate message
-            message = Speaker()
-            message.stream_id = stream.srcId
-            message.frame_ids = stream.seqIds
-            message.start = stream.start
-            message.end = stream.end if stream.end is not None else stream.start
-            message.active = stream.end is None
-            message.duration = stream.duration
-            message.speaker = stream.speaker
-            message.since_last_update = tNow - stream.lastUpdate
-            if len(stream.azimuths) == 0:
-                message.azimuth = 0
-            elif len(stream.azimuths) == 1:
-                message.azimuth = stream.azimuths[0]
-            else:
-                message.azimuth = reduce(lambda x, y: x + y, stream.azimuths) / len(stream.azimuths)
-            stream.lastUpdate = tNow
+        try:
+            publisher = None
+            message = None
+            tNow = rospy.Time.now()
+            if stream.hasTranscription() and stream.hasKnownSpeaker():
+                publisher = self.transcriptionPublisher
+                # Send the final transcript message
+                message = SentenceTranscription()
+                message.sentence_id = stream.sentenceId
+                message.stream_id = stream.srcId
+                message.frame_ids = stream.seqIds
+                message.start = stream.start
+                message.end = stream.end
+                message.duration = stream.duration
+                message.speaker = stream.speaker
+                message.sentence = str(stream.transcription)
+            elif stream.hasKnownSpeaker():
+                publisher = self.speakerPublisher
+                # Send intermediate message
+                message = Speaker()
+                message.stream_id = stream.srcId
+                message.frame_ids = stream.seqIds
+                message.start = stream.start
+                message.end = stream.end if stream.end is not None else stream.start
+                message.active = stream.end is None
+                message.duration = stream.duration
+                message.speaker = stream.speaker
+                message.since_last_update = tNow - stream.lastUpdate
+                if len(stream.azimuths) == 0:
+                    message.azimuth = 0
+                elif len(stream.azimuths) == 1:
+                    message.azimuth = stream.azimuths[0]
+                else:
+                    message.azimuth = reduce(lambda x, y: x + y, stream.azimuths) / len(stream.azimuths)
+                stream.lastUpdate = tNow
+        except rospy.ROSSerializationException as e:
+            rospy.logerr(e)
+            return
 
         if publisher is not None:
             addHeader(message)

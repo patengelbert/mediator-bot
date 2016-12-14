@@ -8,10 +8,10 @@ from speech_speaker_recognition.msg import AddedUser, Speaker, StartRecognitionM
 from mediator_bot_msgs.msg import MedBotSpeechTiming, MedBotSpeechStatus
 from mediator_bot_msgs.srv import MedBotSpeechQuery
 
-INC_FACTOR_POS = 1.5
-INC_FACTOR_NEG = 2
-DEC_FACTOR_POS = 0.2
-DEC_FACTOR_NEG = 0.1
+INC_FACTOR_POS = 0.2
+INC_FACTOR_NEG = 0.4
+DEC_FACTOR_POS = 0.3
+DEC_FACTOR_NEG = 0.2
 MAX_POS = 10
 MIN_NEG = -10
 THRESHOLD_POS = 5
@@ -52,6 +52,10 @@ class SpeakerContainer(object):
         self.thresholdNeg = thresholdNeg
 
         self.azimuth = 0.0
+
+        self.updateTime = rospy.Time(0.0)
+
+        self.timeout = None
 
     @property
     def msg(self):
@@ -94,6 +98,18 @@ class SpeakerContainer(object):
         msg.azimuth = self.azimuth
         self.pub.publish(msg)
 
+    def startTimeout(self):
+        self.timeout = rospy.Timer(rospy.Duration(self.updateTime.secs, self.updateTime.nsecs), self._doneTimer, True)
+
+    def _doneTimer(self, *args, **kwargs):
+        self.timeout = None
+        self.speaking = False
+
+    def cancelTimeout(self):
+        if self.timeout is not None:
+            self.timeout.shutdown()
+        self._doneTimer()
+
 
 class TimeAllocator:
     """
@@ -108,12 +124,16 @@ class TimeAllocator:
         """
         Callback function to show who is currently speaking
         """
+
         speaker = self.speakers.get(data.speaker)
         if speaker is None:
             rospy.logerr("Speaker {} has not yet been registered".format(data.speaker))
             return
-
-        speaker.speaking = data.active
+        speaker.cancelTimeout()
+        speaker.updateTime = data.since_last_update
+        # If we receive only one message for a stream which is non-speaking, count it as speaking instead
+        speaker.speaking = data.active or (data.active == speaker.speaking and not data.active)
+        speaker.startTimeout()
         speaker.azimuth = data.azimuth
 
     def getSpeechStatus(self, req):
@@ -171,7 +191,6 @@ class TimeAllocator:
             barLength   - Optional  : character length of bar (Int)
         """
 
-
         if not self.init:
             sys.stdout.write(''.join([CURSOR_UP_ONE] * len(self.speakers)))
         self.init = False
@@ -196,17 +215,18 @@ class TimeAllocator:
         speaker. The result is printed on the terminal.
         """
 
-        if not self.start:
-            return
+        # if not self.start:
+        #     return
 
         # Increment/decrement the time allocation based on if they are speaking
         for speaker in self.speakers.itervalues():
+            t = speaker.updateTime.to_sec()
             if speaker.speaking:
                 factor = INC_FACTOR_POS if speaker.weight >= 0 else INC_FACTOR_NEG
-                speaker.weight += float(factor) / float(self.rate)
+                speaker.weight += float(factor) * t / float(self.rate)
             else:
                 factor = DEC_FACTOR_POS if speaker.weight >= 0 else DEC_FACTOR_NEG
-                speaker.weight -= float(factor) / float(self.rate)
+                speaker.weight -= float(factor) * t / float(self.rate)
             speaker.sendMessage()
         if self.debugLevel <= rospy.INFO:
             # Print out the current speech participation levels
