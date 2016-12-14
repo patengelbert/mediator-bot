@@ -364,9 +364,10 @@ var action_listener= new ROSLIB.Topic({
 
 var percent_listener=new ROSLIB.Topic({
   ros:ros,
-  name:'/Percentage',
-  messageType:'ui/Percentage'
+  name:'/speaker_weightings',
+  messageType: 'mediator_bot_msgs/MedBotSpeechTiming'
 });
+
 /*
 var register_listener=new ROSLIB.Topic({
   ros:ros,
@@ -438,15 +439,18 @@ action_listener.subscribe(function(message){
 //  action_listener.unsubscribe();
 });
 percent_listener.subscribe(function(message){
-  console.log(message.Person + message.Percentage);
-  for(var i=0; i<ui.people.length; i++){
-    if(ui.people[i]["person"]==message.Person){
-      ui.people[i]["percent"]=message.Percentage;
-      create_bargraph();
-      //break;  
-    }
-  }
+  //console.log(message.Person + message.Percentage);
+  for(var speaker=0;speaker<message.num_speakers;speaker++){
+      for(var i=0; i<ui.people.length; i++){
+        if(ui.people[i]["person"]==message.speaker_id[speaker]){
+          ui.people[i]["percent"]=message.weighting[speaker];
+          create_bargraph();
+          //break;
+        }
+      }
+   }
 });
+
 /*
 register_listener.subscribe(function(message){
   console.log(message.label + message.success);

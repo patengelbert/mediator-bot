@@ -3,6 +3,7 @@ import rospy
 import actionlib
 import random
 
+import time
 from naoqi import ALProxy
 
 from action_response.msg import responseAction
@@ -41,6 +42,7 @@ from actions import (
     NearlyDoneResponse,
     ThankYouResponse,
     ThankYouResponseNamed,
+    InterruptResponse,
 )
 
 # NAO IP address and port
@@ -78,6 +80,7 @@ actionsToAdd = {
     NearlyDoneResponse,
     ThankYouResponse,
     ThankYouResponseNamed,
+    InterruptResponse,
 }
 
 if not ALLOW_ANGRY_ACTIONS:
@@ -178,6 +181,7 @@ class ResponseServer:
         self.addActions()
 
         self.bm.startBehavior("actions-67d9a5/BreatheBody")
+        rospy.sleep(5)
 
         self.server.start()
 
@@ -192,21 +196,22 @@ class ResponseServer:
             self.mp.rest()
 
     def execute(self, goal):
+        self._execute(goal.keywords, goal.name, goal.direction)
+        self.server.set_succeeded()
+
+    def _execute(self, keywords, name=None, direction=None):
         self.bm.stopAllBehaviors()
-        kw = goal.keywords
-        m = actionLibrary.getMovementAction(kw)
-        r = actionLibrary.getResponseAction(kw)
+        m = actionLibrary.getMovementAction(keywords)
+        r = actionLibrary.getResponseAction(keywords)
         if m is not None:
-            dir = goal.direction if goal.direction is not None else 0.0
-            m.run(max(min(dir, 90.0), -90.0))
+            direction = direction if direction is not None else 0.0
+            m.run(max(min(direction, 90.0), -90.0))
         if r is not None:
-            name = goal.name if goal.name is not None else "You"
+            name = name if name is not None else "You"
             r.run(changeName(name))
 
         self.bm.runBehavior("actions-67d9a5/Return")
         self.bm.startBehavior("actions-67d9a5/BreatheBody")
-
-        self.server.set_succeeded()
 
     def run(self):
         rospy.spin()

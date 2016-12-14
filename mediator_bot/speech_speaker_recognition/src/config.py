@@ -10,9 +10,11 @@ MAXREQUESTS = 14400 + 50000  # Free + Trial
 RPCPERIOD = 0.5
 TIMEOUT = 10
 MAXCONCURRENT = 4
-SPEAKERMODEL = "models/patrick_ryan_2016-12-14.bin"
+SPEAKERMODEL = "models/Becks_Ryan_Julia_2016-12-14.bin"
 
 DISCOVERY_URL = ('https://{api}.googleapis.com/$discovery/rest?'
                  'version={apiVersion}')
 
 SAVELOADEVENTSUPPORTED = False
+
+USE_TRANSCRIPTION = False

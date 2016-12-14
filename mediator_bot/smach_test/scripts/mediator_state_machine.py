@@ -16,9 +16,9 @@ EXTRA_KEYWORD_THRESHOLD = 0.6
 SELECT_OTHER_THRESHOLD = 0.5
 SAY_THANK_YOU_THRESHOLD = 0.5
 
-SINGLE_TIMEOUT = 15.0
-GROUP_TIMEOUT = 25.0
-ACTION_TIMEOUT = 10.0
+SINGLE_TIMEOUT = 10.0
+GROUP_TIMEOUT = 60.0
+ACTION_TIMEOUT = 25.0
 
 class Status(Enum):
     NO_STATUS = 0
@@ -341,7 +341,7 @@ class Quieten(State):
         extraKey = [] if random.random() < EXTRA_KEYWORD_THRESHOLD else ["directed"]  # Maybe force directed
         self.req(keywords=["stop"] + extraKey, name=speaker.label, direction=speaker.azimuth)
         speaker.startTimeout(SINGLE_TIMEOUT)
-        return 'select_other' if random.random() > SELECT_OTHER_THRESHOLD and len(self.speakerStates.speakers) > 1 else 'success'
+        return 'select_other'
 
 
 class SelectOtherAfterQuieten(State):
@@ -396,7 +396,7 @@ class GroupQuestion(State):
     def _execute(self, userdata):
         if not self.client.allowGroup:
             return 'skipped'
-        self.req(keywords=["start", "anyone"], name="", direction=0.0)
+        self.req(keywords=["start_anyone"], name="", direction=0.0)
         self.client.startTimeout(GROUP_TIMEOUT)
         return 'success'
 
@@ -408,7 +408,7 @@ class GroupQuieten(State):
     def _execute(self, userdata):
         if not self.client.allowGroup:
             return 'skipped'
-        self.req(keywords=["stop", "anyone"], name="", direction=0.0)
+        self.req(keywords=["stop_anyone"], name="", direction=0.0)
         self.client.startTimeout(GROUP_TIMEOUT)
         return 'success'
 

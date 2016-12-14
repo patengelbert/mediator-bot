@@ -8,13 +8,13 @@ from speech_speaker_recognition.msg import AddedUser, Speaker, StartRecognitionM
 from mediator_bot_msgs.msg import MedBotSpeechTiming, MedBotSpeechStatus
 from mediator_bot_msgs.srv import MedBotSpeechQuery
 
-INC_FACTOR_POS = 0.2
-INC_FACTOR_NEG = 0.4
+INC_FACTOR_POS = 0.4
+INC_FACTOR_NEG = 0.5
 DEC_FACTOR_POS = 0.3
-DEC_FACTOR_NEG = 0.2
+DEC_FACTOR_NEG = 0.1
 MAX_POS = 10
 MIN_NEG = -10
-THRESHOLD_POS = 5
+THRESHOLD_POS = 7
 THRESHOLD_NEG = -5
 START_WEIGHT = 0
 RATE = 10
@@ -53,7 +53,7 @@ class SpeakerContainer(object):
 
         self.azimuth = 0.0
 
-        self.updateTime = rospy.Time(0.0)
+        self.updateTime = rospy.Time(0.1)
 
         self.timeout = None
 
@@ -104,6 +104,7 @@ class SpeakerContainer(object):
     def _doneTimer(self, *args, **kwargs):
         self.timeout = None
         self.speaking = False
+        self.updateTime = rospy.Time(1.0)
 
     def cancelTimeout(self):
         if self.timeout is not None:
@@ -215,8 +216,8 @@ class TimeAllocator:
         speaker. The result is printed on the terminal.
         """
 
-        # if not self.start:
-        #     return
+        if not self.start:
+            return
 
         # Increment/decrement the time allocation based on if they are speaking
         for speaker in self.speakers.itervalues():
@@ -240,7 +241,8 @@ class TimeAllocator:
         msg.header.stamp = rospy.Time().now()
         msg.num_speakers = len(self.speakers)
         msg.speaker_id = [s.label for s in self.speakers.itervalues()]
-        msg.weighting = [float(s.weight) for s in self.speakers.itervalues()]
+        percents = [100 * float(speaker.weight) / (float(speaker.maxVal) if speaker.weight >= 0 else (-1 * float(speaker.minVal))) for speaker in self.speakers.itervalues()]
+        msg.weighting = percents
         self.pubWeight.publish(msg)
 
     def run(self):

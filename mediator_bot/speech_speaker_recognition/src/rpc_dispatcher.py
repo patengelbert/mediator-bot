@@ -6,10 +6,12 @@ import rospy
 from concurrent.futures import Future
 from googleapiclient import discovery
 
-from config import RPCPERIOD, TIMEOUT, MAXCONCURRENT, DISCOVERY_URL
+from config import RPCPERIOD, TIMEOUT, MAXCONCURRENT, DISCOVERY_URL, USE_TRANSCRIPTION
 from locks import TimeoutLock
 from periodic_thread import PeriodicThread
 from socket_pool import GoogleSocketPool
+
+from custom_exceptions import RequestMethodError
 
 
 class RPCDispatcher(object):
@@ -67,6 +69,8 @@ class RPCDispatcher(object):
             thread.start()
 
     def __sendRequest(self, body, future):
+        if not USE_TRANSCRIPTION:
+            future.set_exception(RequestMethodError("Transcription is disabled"))
         thread = threading.currentThread()
         try:
             with self.createGoogleRequest() as request:
