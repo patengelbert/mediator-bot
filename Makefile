@@ -38,7 +38,7 @@ install-ros:
 	sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $(ROS_CI_DESKTOP) main\" > /etc/apt/sources.list.d/ros-latest.list"
 	wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
 	sudo apt-get update -qq
-	sudo apt-get install -y python-catkin-pkg python-rosdep python-wstool ros-$(ROS_DISTRO)-catkin python-rosinstall ros-$(ROS_DISTRO)-smach ros-$(ROS_DISTRO)-smach-viewer ros-$(ROS_DISTRO)-nao-robot ros-$(ROS_DISTRO)-nao-extras ros-${ROs_DISTRO}-rqt
+	sudo apt-get install -y python-catkin-pkg python-rosdep python-wstool ros-$(ROS_DISTRO)-catkin python-rosinstall ros-$(ROS_DISTRO)-smach ros-$(ROS_DISTRO)-smach-viewer ros-$(ROS_DISTRO)-nao-robot ros-$(ROS_DISTRO)-nao-extras ros-${ROs_DISTRO}-rqt ros-${ROS_DISTRO}-rosbridge
 # Prepare rosdep to install dependencies.
 	sudo rm -f /etc/ros/rosdep/sources.list.d/20-default.list
 	sudo rosdep init
@@ -117,7 +117,7 @@ test:
 run:
 	( \
 	. /opt/ros/$(ROS_DISTRO)/setup.sh ; \
-	roscore ; \
+	roslaunch rosbridge+server rosbridge_websocket.launch
 	)
 
 docs:
