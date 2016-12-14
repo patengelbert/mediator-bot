@@ -52,7 +52,7 @@ find_package(catkin REQUIRED COMPONENTS
    Person_Register.msg
    Person_Setup.msg
    Transcript.msg
-  
+   AddedUser.msg
  )
 
 ## Generate added messages and services with any dependencies listed here
