@@ -58,6 +58,8 @@ git stash pop
 
 [Final Report](https://www.overleaf.com/7427603bmmydhjfsxxn)
 
+[Google Form](https://docs.google.com/forms/d/e/1FAIpQLSdMQ1PWSnZSL3sv7OPfQDM9imTj5WT-ATlbbMTxmg3NjYFt5g/viewform)
+
 ## System
 
 ![System Overview](https://github.com/patengelbert/mediator-bot/raw/master/images/System Overview.png?raw=true)
