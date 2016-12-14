@@ -26,9 +26,8 @@ function user_interface(){
   
   this.actions={
     none: ["",""],
-    natural: ["", ""], 
     multiple: ["Please don't speak over each other","Don't speak over, let everyone get a chance"],
-    loud: ["Please speak more softly", "Did I ask for your input?"] ,
+  //  loud: ["Please speak more softly", "Did I ask for your input?"] ,
     stop: ["Please stop speaking", "Shush"],
 		thanks: ["Thank you for following our instructions",""],
     start: ["Do you have any thoughts on the matter?", "Come on what do you think?"],
@@ -119,6 +118,9 @@ var create_bargraph=function(){
           return ui.people[index].person;
         });
         //innerHTML=ui.people[index][0];
+        var person_width=(ui.people[index].percent/2)+50;
+        person_width=Math.max(0, person_width);
+        person_width=Math.min(person_width, 100);
         $(this).css( "width", ui.people[index].percent + "%");
   });
   
@@ -353,6 +355,7 @@ var endEnrollment= new ROSLIB.Service({
 
 //Subscribing to a topic
 //----------
+
 var action_listener= new ROSLIB.Topic({
   ros:ros,
   name:'/Action',
@@ -389,11 +392,48 @@ person_added_listener.subscribe(function(message){
   set_test_mode(TEST_MODE); 
 });
   
+
+
 action_listener.subscribe(function(message){
   //alert("hello");
-  console.log(message.Person + message.Action + message.Mood);
+  var index=0;
+  for(var u=0; u< message.keywords.length; u++){
+    if(message.keywords[u]=="stop" || message.keywords[u]=="start"){
+      index=u;
+    }
+    if((message.keywords[u]=="select_other" || message.keywords[u]=="thanks" || message.keywords[u]=="multiple" || message.keywords[u]=="nearly_done" || message.keywords[u]=="outro") && message.keywords[index]!="stop" && message.keywords[index]!="start"){
+      index=u;
+    }    
+  }
+  console.log(message.keywords[0] + message.name);
+  switch(message.keywords[index]){
+    case "multiple":
+      set_action("multiple", "shocked", "");
+      break;
+    case "stop":
+      set_action("stop", "angry", message.name);
+      break;
+    case "thanks":
+      set_action("thanks", "happy", message.name);
+      break;
+    case "start":
+      set_action("start", "happy", message.name);
+      break;
+    case "nearly_done":
+      set_action("nearly_done", "sad", message.name);
+      break;      
+    case "outro":
+      set_action("outro", "happy", message.name);
+      break;
+    case "select_other":
+      set_action("select_other", "sad", message.name);
+      break;
+    default:
+      set_action("none", "neutral", message.name);
+      break;
+  }
   //alert("hello world");
-  set_action(message.Action, message.Mood.toLowerCase(), message.Person);
+ // set_action(message.Action, message.Mood.toLowerCase(), message.Person);
   //setTimeout(function() { set_action("none", "neutral", ""); }, 3000);
 //  action_listener.unsubscribe();
 });
