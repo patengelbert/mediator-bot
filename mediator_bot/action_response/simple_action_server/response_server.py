@@ -204,7 +204,7 @@ class ResponseServer:
             r.run(changeName(name))
 
         self.bm.runBehavior("actions-67d9a5/Return")
-        self.bm.startBehavior("actions-67d9a5/Breathe")
+        self.bm.startBehavior("actions-67d9a5/BreatheBody")
 
         self.server.set_succeeded()
 
