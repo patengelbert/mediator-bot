@@ -177,7 +177,7 @@ class ResponseServer:
 
         self.addActions()
 
-        self.bm.startBehavior("actions-67d9a5/Breathe")
+        self.bm.startBehavior("actions-67d9a5/BreatheBody")
 
         self.server.start()
 
