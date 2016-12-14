@@ -5,7 +5,7 @@ var MESSAGE=1;
 var BAR=2;
 var PIE=3;
 var SET_UP=4;
-var TEST_MODE=2;
+var TEST_MODE=BAR;
 var repeat_sentence="<b>Speak the following sentence:</b> Donald Trump lost the popular vote, in a true democratic system he would not be president ";
 var registration_mode=0;
 
@@ -233,7 +233,7 @@ Click handles, document.ready()
 $(document).ready(function(){
   //demo
   //$("#set_up").css("visibility", "hidden");
-  set_test_mode(BAR); 
+  set_test_mode(TEST_MODE); 
   //set_action("too_loud","happy", "Bob");
 $("#set_up_link").click(function(){
   //alert("sup");
@@ -386,6 +386,7 @@ person_added_listener.subscribe(function(message){
   console.log(message.name);
   //ui.people.push
   ui.people.push({person:message.name,percent: 0,x:0,y:0});
+  set_test_mode(TEST_MODE); 
 });
   
 action_listener.subscribe(function(message){
