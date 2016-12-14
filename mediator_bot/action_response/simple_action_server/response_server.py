@@ -40,11 +40,12 @@ from actions import (
     OutroResponse,
     NearlyDoneResponse,
     ThankYouResponse,
+    ThankYouResponseNamed,
 )
 
 # NAO IP address and port
 
-robotIP = "169.254.81.101"
+robotIP = "169.254.44.123"
 robotPort = 9559
 
 actionsToAdd = {
@@ -76,6 +77,7 @@ actionsToAdd = {
     OutroResponse,
     NearlyDoneResponse,
     ThankYouResponse,
+    ThankYouResponseNamed,
 }
 
 if not ALLOW_ANGRY_ACTIONS:

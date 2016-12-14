@@ -273,3 +273,11 @@ class NearlyDoneResponse(ResponseAction):
 
     def _response(self, name):
         self.textToSpeechProxy.say("The time for this discussion is nearly up. Are there any last comments?")
+
+
+class ThankYouResponseNamed(ResponseAction):
+    keywords = {"thanks"}
+
+    def _response(self, name):
+        self.textToSpeechProxy.say("Thank you, {}".format(name))
+
