@@ -25,6 +25,7 @@ function user_interface(){
   this.message="";
   
   this.actions={
+    none: ["",""],
     natural: ["", ""], 
     multiple: ["Please don't speak over each other","Don't speak over, let everyone get a chance"],
     loud: ["Please speak more softly", "Did I ask for your input?"] ,
@@ -225,7 +226,9 @@ var set_face_mode=function(face){
 
 
 
-
+/*************************************************************************************************************
+Click handles, document.ready()
+***************************************************************************************************************/
 
 $(document).ready(function(){
   //demo
@@ -316,7 +319,7 @@ $('#submit_name').click(function(){
 
 
 //Connecting to ROS
-//------------------------------------------------
+//----------------------------------------------------------------------------------------
 var ros = new ROSLIB.Ros({
   url : 'ws://localhost:9090'
 });
@@ -372,11 +375,23 @@ var transcript_listener=new ROSLIB.Topic({
   messageType:'ui/Transcript'
 });
 
+var person_added_listener=new ROSLIB.Topic({
+  ros:ros,
+  name:'/added_user',
+  messageType:'ui/AddedUser'
+  });
+person_added_listener.subscribe(function(message){
+  console.log(message.name);
+  //ui.people.push
+  ui.people.push({person:message.name,percent: 0,x:0,y:0});
+});
+  
 action_listener.subscribe(function(message){
   //alert("hello");
   console.log(message.Person + message.Action + message.Mood);
   //alert("hello world");
   set_action(message.Action, message.Mood.toLowerCase(), message.Person);
+  //setTimeout(function() { set_action("none", "neutral", ""); }, 3000);
 //  action_listener.unsubscribe();
 });
 percent_listener.subscribe(function(message){
