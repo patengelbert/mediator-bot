@@ -306,7 +306,7 @@ class Node(object):
 
         rospy.loginfo("Starting")
 
-        rate = rospy.Rate(1)
+        rate = rospy.Rate(1.8)
         firstLoop = True
         while not rospy.is_shutdown():
             rate.sleep()

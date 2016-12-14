@@ -12,6 +12,14 @@ from speech_speaker_recognition.msg import AddedUser, StartRecognitionMsg
 from action_response.msg import responseAction, responseGoal
 
 
+EXTRA_KEYWORD_THRESHOLD = 0.6
+SELECT_OTHER_THRESHOLD = 0.5
+SAY_THANK_YOU_THRESHOLD = 0.5
+
+SINGLE_TIMEOUT = 15.0
+GROUP_TIMEOUT = 25.0
+ACTION_TIMEOUT = 10.0
+
 class Status(Enum):
     NO_STATUS = 0
     TOO_LONG = 1
@@ -30,17 +38,23 @@ class Speaker(object):
         self.allowed = True
 
     def startTimeout(self, time):
+        rospy.logdebug("Starting timeout of {:s}".format(self))
         self.allowed = False
-        self.timeout = rospy.Timer(time, self._doneTimer, True)
+        self.timeout = rospy.Timer(rospy.Duration(time), self._doneTimer, True)
 
-    def _doneTimer(self):
+    def _doneTimer(self, *args, **kwargs):
+        rospy.logdebug("Finished timeout of {:s}".format(self))
         self.timeout = None
         self.allowed = True
 
     def cancelTimeout(self):
         if self.timeout is not None:
+            rospy.logdebug("Cancelled timeout of {:s}".format(self))
             self.timeout.shutdown()
         self._doneTimer()
+
+    def __str__(self):
+        return str(self.label)
 
 
 class SpeakerStates:
@@ -96,26 +110,84 @@ class SpeakerStates:
         return l[0] if len(l) > 0 else None
 
     def getTooLongActiveSpeakers(self):
-	return [s for s in self.speakers.itervalues() if s.speaking and s.status == Status.TOO_LONG and s.allowed]
+        return [s for s in self.speakers.itervalues() if s.speaking and s.status == Status.TOO_LONG and s.allowed]
 
     def getNextTooLongActiveSpeaker(self):
         l = self.getTooLongActiveSpeakers()
         if len(l) == 0:
-             return None
+            return None
         return random.choice(l)
+
+    def getTooShortInactiveSpeakers(self):
+        return [s for s in self.speakers.itervalues() if not s.speaking and s.status == Status.TOO_SHORT and s.allowed]
+
+    def getNextTooShortInactiveSpeaker(self):
+        l = self.getTooShortInactiveSpeakers()
+        if len(l) == 0:
+            return None
+        return random.choice(l)
+
+
+class ActionClientException(Exception):
+    def __init__(self, what):
+        self.what = what
+
+    def __str__(self):
+        return str(self.what)
 
 
 class ActionClient(object):
     client = None
 
-    def __init__(self):
-        self.client = actionlib.SimpleActionClient('response', responseAction)
-        self.client.wait_for_server()
+    allowGroup = True
+    timeout = None
+    allowSpecialActions = True
 
-    def req(self, name, direction, keywords):
+    def __init__(self, name="response", timeout=5.0):
+        self.topic = name
+
+        self.client = actionlib.SimpleActionClient(self.topic, responseAction)
+        rospy.logdebug("Waiting for server")
+        if not self.client.wait_for_server(timeout=rospy.Duration(timeout)):
+            raise ActionClientException("Could not connect to action server '{}'".format(self.topic))
+
+    def req(self, name, direction, keywords, timeout=5.0):
         goal = responseGoal(keywords=keywords, name=name, direction=direction)
         self.client.send_goal(goal)
-        self.client.wait_for_result(rospy.Duration.from_sec(5.0))
+        if not self.client.wait_for_result(timeout=rospy.Duration(timeout)):
+            raise ActionClientException("Did not receive response from server '{}' for request {:s}".format(self.topic, goal))
+
+    def startTimeout(self, time):
+        rospy.logdebug("Starting timeout of groups")
+        self.allowGroup = False
+        self.timeout = rospy.Timer(rospy.Duration(time), self._doneTimer, True)
+
+    def _doneTimer(self, *args, **kwargs):
+        rospy.logdebug("Finished timeout of groups")
+        self.timeout = None
+        self.allowGroup = True
+
+    def cancelTimeout(self):
+        if self.timeout is not None:
+            rospy.logdebug("Cancelled timeout of groups")
+            self.timeout.shutdown()
+        self._doneTimer()
+
+    def startActionTimeout(self, time):
+        rospy.logdebug("Starting timeout of groups")
+        self.allowSpecialActions = False
+        self.timeout = rospy.Timer(rospy.Duration(time), self._doneActionTimer, True)
+
+    def _doneActionTimer(self, *args, **kwargs):
+        rospy.logdebug("Finished timeout of groups")
+        self.timeout = None
+        self.allowSpecialActions = True
+
+    def cancelActionTimeout(self):
+        if self.timeout is not None:
+            rospy.logdebug("Cancelled timeout of groups")
+            self.timeout.shutdown()
+        self._doneTimer()
 
 
 running = False
@@ -153,6 +225,12 @@ class State(smach.State):
             self.service_preempt()
             return 'preempted'
 
+    def req(self, *args, **kwargs):
+        try:
+            self.client.req(*args, **kwargs)
+        except ActionClientException as e:
+            rospy.logwarn(e)
+
     def __str__(self):
         return self.__class__.__name__
 
@@ -170,7 +248,7 @@ class Initialise(State):
     def _execute(self, userdata):
         # get names from topic, added user
         rospy.loginfo('Waiting for registered users...')
-        while not self.speakerStates.speakers and not running:  # wait while there are no registered
+        while not running:  # wait while there are no registered
             self.checkPreemption()
             rospy.sleep(0.5)
         rospy.loginfo('Users registered')
@@ -191,7 +269,7 @@ class StartTopic(State):
 
     def introSequence(self):
         rospy.loginfo('*Intro Sequence*')
-        self.client.req(keywords=["intro"], name="", direction=0.0)
+        self.req(keywords=["intro"], name="", direction=0.0, timeout=10.0)
 
 
 class LookAtSpeaker(State):
@@ -204,6 +282,7 @@ class LookAtSpeaker(State):
         action = self.checkNoImportantActions(userdata)
 
         if action is not None:
+            self.client.startActionTimeout(ACTION_TIMEOUT)
             return action
 
         count = 0
@@ -217,7 +296,7 @@ class LookAtSpeaker(State):
 
         if not rospy.is_shutdown() and s is not None and len(s) > 0:
             speaker = random.choice(s)
-            self.client.req(keywords=['natural'], name=speaker.label, direction=speaker.azimuth)
+            self.req(keywords=['natural'], name=speaker.label, direction=speaker.azimuth)
             return 'looked'
 
         if not rospy.is_shutdown():
@@ -226,78 +305,71 @@ class LookAtSpeaker(State):
         return 'finished'
 
     def checkNoImportantActions(self, userData):
-        tooLong = self.speakerStates.getNextTooLongActiveSpeaker()
-        if tooLong is not None:
-            userData.name = tooLong.label
-            return 'quieten'
 
+        if not self.client.allowSpecialActions:
+            return None
+
+        tooLongs = self.speakerStates.getTooLongActiveSpeakers()
+        tooShorts = self.speakerStates.getTooShortInactiveSpeakers()
+        if len(tooShorts) >= 2:
+            userData.name = ""
+            return 'group_question'
+        elif len(tooLongs) >= 2:
+            userData.name = ""
+            return 'group_quieten'
+        elif len(tooLongs) > 0:
+            userData.name = random.choice(tooLongs).label
+            return 'quieten'
+        elif len(tooShorts) > 0:
+            userData.name = random.choice(tooShorts).label
+            return 'question'
         return None
 
 
-# # define state Mediate
-# class Mediate(State):
-#     """
-#     Main state mediating the conversation. Constantly checking the state of
-#     the conversation in order to give a appropriate response.
-#     """
-#
-#     outcomes = ['timeup', 'control_conv', 'not_speaking']
-#
-#     def __init__(self, speakerStates, client):
-#         super(Mediate, self).__init__(speakerStates, client)
-#         self.timeup = False
-#         self.init = False
-#         self.duration = 500
-#         self.timerStart = 0
-#
-#     def _execute(self, userdata):
-#         rospy.sleep(3)
-#         self.checkPreemption()
-#         if not self.init:
-#             self.initTimer()
-#         while not rospy.is_shutdown():
-#             if (rospy.Time.now() - self.timerStart) > rospy.Duration(self.duration - 30) and not self.timeup:
-#                 self.client.req(keywords=["nearly_done"], direction=0.0, name="")
-#             elif self.timeup:
-#                 # time run out
-#                 return 'timeup'
-#             elif len(self.speakerStates.getTooLongSpeakers()) > 0:
-#                 # someones talking too much, ask least talkative person a question
-#                 return 'not_speaking'
-#             elif self.speakerStates.getNumActiveSpeakers() > 2:
-#                 # too many speakers
-#                 return 'control_conv'
-#
-#     def initTimer(self):
-#         rospy.Timer(rospy.Duration(self.duration), self.callback, oneshot=True)
-#         self.init = True
-#         self.timerStart = rospy.Time.now()
-#
-#     def callback(self, event):
-#         rospy.loginfo('Time is up: ' + str(event.current_real))
-#         self.timeup = True
-#
-#
-# # define state Quieten
 class Quieten(State):
     """
     Too many people are currently talking. Attempt to return to a single
     speaker.
     """
-    outcomes = ['success']
+    outcomes = ['success', 'select_other']
     input_data = ['name']
     output_data = ['name']
 
     def _execute(self, userdata):
         speaker = self.speakerStates.speakers[userdata.name]
         # Ask to be quiet with nao
-        extraKey = [] if random.random() < 0.6 else ["directed"] # Maybe force directed
-        self.client.req(keywords=["stop"] + extraKey, name=speaker.label, direction=speaker.azimuth)
+        extraKey = [] if random.random() < EXTRA_KEYWORD_THRESHOLD else ["directed"]  # Maybe force directed
+        self.req(keywords=["stop"] + extraKey, name=speaker.label, direction=speaker.azimuth)
+        speaker.startTimeout(SINGLE_TIMEOUT)
+        return 'select_other' if random.random() > SELECT_OTHER_THRESHOLD and len(self.speakerStates.speakers) > 1 else 'success'
 
+
+class SelectOtherAfterQuieten(State):
+
+    outcomes = ['success']
+    input_data = ['name']
+
+    def _execute(self, userdata):
+        chosenSpeaker = self.speakerStates.getLowestWeightedSpeaker()
+        if chosenSpeaker is not None and chosenSpeaker.label != userdata.name:
+            # Don't shut someone up and then select them again
+            self.req(keywords=["start"], name=chosenSpeaker.label, direction=chosenSpeaker.azimuth)
+            chosenSpeaker.startTimeout(SINGLE_TIMEOUT)
         return 'success'
 
 
-class Happy(State):
+class Question(State):
+    outcomes = ['success']
+    input_data = ['name']
+
+    def _execute(self, userdata):
+        chosenSpeaker = self.speakerStates.speakers[userdata.name]
+        self.req(keywords=["start"], name=chosenSpeaker.label, direction=chosenSpeaker.azimuth)
+        chosenSpeaker.startTimeout(SINGLE_TIMEOUT)
+        return 'success'
+
+
+class HappyNamed(State):
     """
     Show the previous action was successful.
     """
@@ -307,35 +379,57 @@ class Happy(State):
 
     def _execute(self, userdata):
         rospy.sleep(2)
-        if random.random() < 0.5:
-	    return 'success'
+        if random.random() < SAY_THANK_YOU_THRESHOLD:
+            return 'success'
 
         speaker = self.speakerStates.speakers[userdata.name]
         rospy.sleep(1)
         if not speaker.speaking:
-            self.client.req(keywords=["thanks"], name=speaker.label, direction=speaker.azimuth)
+            self.req(keywords=["thanks"], name=speaker.label, direction=speaker.azimuth)
         return 'success'
 
 
-#
-#
-# # define state AskQuestion
-# class AskQuestion(State):
-#     """
-#     Ask least talkative person a question if someone talking too much.
-#     """
-#
-#     outcomes = ['success']
-#
-#     def _execute(self, userdata):
-#         # direct question at person
-#         speaker = self.speakerStates.getNextTooLongSpeaker()
-#         if speaker is not None:
-#             self.client.req(keywords=["stop"], name=speaker.label,
-#                             direction=speaker.azimuth)
-#         return 'success'
-#
-#
+class GroupQuestion(State):
+
+    outcomes = ['success', 'skipped']
+
+    def _execute(self, userdata):
+        if not self.client.allowGroup:
+            return 'skipped'
+        self.req(keywords=["start", "anyone"], name="", direction=0.0)
+        self.client.startTimeout(GROUP_TIMEOUT)
+        return 'success'
+
+
+class GroupQuieten(State):
+
+    outcomes = ['success', 'skipped']
+
+    def _execute(self, userdata):
+        if not self.client.allowGroup:
+            return 'skipped'
+        self.req(keywords=["stop", "anyone"], name="", direction=0.0)
+        self.client.startTimeout(GROUP_TIMEOUT)
+        return 'success'
+
+
+class Happy(State):
+    """
+    Show the previous action was successful.
+    """
+
+    outcomes = ['success']
+
+    def _execute(self, userdata):
+        rospy.sleep(2)
+        if random.random() < SAY_THANK_YOU_THRESHOLD:
+            return 'success'
+
+        if len(self.speakerStates.getActiveSpeakers()) == 0:
+            self.req(keywords=["thanks"], name="", direction=0.0)
+        return 'success'
+
+
 class CloseTopic(State):
     """
     Wrap up the current topic.
@@ -346,14 +440,9 @@ class CloseTopic(State):
     def _execute(self, userdata):
         rospy.sleep(1)
         self.checkPreemption()
-        self.client.req(keywords=["outro"], name="", direction=0.0)
+        self.req(keywords=["outro"], name="", direction=0.0)
         return 'finished'
 
-
-# def callbackLoud(): # too loud
-# Compute average power of the frames and make sure it doesnt exceed a threshold
-
-# Status checking functions #
 
 def started(data):
     global running
@@ -364,7 +453,11 @@ def main():
     rospy.init_node('mediatorbot_state_machine', log_level=rospy.DEBUG)
 
     speakerStates = SpeakerStates()
-    actionclient = ActionClient()
+    try:
+        actionclient = ActionClient()
+    except ActionClientException as e:
+        rospy.logerr(e)
+        return
     rospy.Subscriber("start_recognition", StartRecognitionMsg, started)
     rospy.Subscriber("/added_user", AddedUser, speakerStates.addNewSpeaker)
     rospy.Subscriber("/speaker_change_state", MedBotSpeechStatus,
@@ -383,35 +476,51 @@ def main():
                                             'errored': 'errored',
                                             'finished': 'CloseTopic',
                                             'quieten': 'Quieten',
-                                            'question': 'LookAtSpeaker',
-                                            'group_question': 'LookAtSpeaker',
-                                            'group_quieten': 'LookAtSpeaker'},
-remapping={'name': 'sm_name'})
+                                            'question': 'Question',
+                                            'group_question': 'GroupQuestion',
+                                            'group_quieten': 'GroupQuieten'},
+                               remapping={'name': 'sm_name'})
         smach.StateMachine.add('StartTopic', StartTopic(speakerStates, actionclient),
                                transitions={'intro_complete': 'LookAtSpeaker',
                                             'preempted': 'preempted',
                                             'errored': 'errored'})
-        # smach.StateMachine.add('Mediate', Mediate(speakerStates, actionclient),
-        #                        transitions={'timeup': 'CloseTopic', 'control_conv': 'Quieten',
-        #                                     'not_speaking': 'AskQuestion',
-        #                                     'preempted': 'preempted',
-        #                                     'errored': 'errored'})
         smach.StateMachine.add('Quieten', Quieten(speakerStates, actionclient),
-                               transitions={'success': 'Happy',
+                               transitions={'success': 'HappyNamed',
+                                            'select_other': 'SelectOtherAfterQuieten',
                                             'preempted': 'preempted',
                                             'errored': 'errored'},
-remapping={'name': 'sm_name'})
-        smach.StateMachine.add('Happy', Happy(speakerStates, actionclient),
+                               remapping={'name': 'sm_name'})
+        smach.StateMachine.add('HappyNamed', HappyNamed(speakerStates, actionclient),
                                transitions={'success': 'LookAtSpeaker',
                                             'preempted': 'preempted',
                                             'errored': 'errored'},
-remapping={'name': 'sm_name'})
-        # smach.StateMachine.add('AskQuestion', AskQuestion(speakerStates, actionclient),
-        #                        transitions={'success': 'Mediate',
-        #                                     'preempted': 'preempted',
-        #                                     'errored': 'errored'})
+                               remapping={'name': 'sm_name'})
         smach.StateMachine.add('CloseTopic', CloseTopic(speakerStates, actionclient),
                                transitions={'finished': 'end',
+                                            'preempted': 'preempted',
+                                            'errored': 'errored'})
+        smach.StateMachine.add('SelectOtherAfterQuieten', SelectOtherAfterQuieten(speakerStates, actionclient),
+                               transitions={'success': 'LookAtSpeaker',
+                                            'preempted': 'preempted',
+                                            'errored': 'errored'},
+                               remapping={'name': 'sm_name'})
+        smach.StateMachine.add('Question', Question(speakerStates, actionclient),
+                               transitions={'success': 'LookAtSpeaker',
+                                            'preempted': 'preempted',
+                                            'errored': 'errored'},
+                               remapping={'name': 'sm_name'})
+        smach.StateMachine.add('GroupQuestion', GroupQuestion(speakerStates, actionclient),
+                               transitions={'success': 'LookAtSpeaker',
+                                            'skipped': 'LookAtSpeaker',
+                                            'preempted': 'preempted',
+                                            'errored': 'errored'})
+        smach.StateMachine.add('GroupQuieten', GroupQuieten(speakerStates, actionclient),
+                               transitions={'success': 'Happy',
+                                            'skipped': 'LookAtSpeaker',
+                                            'preempted': 'preempted',
+                                            'errored': 'errored'})
+        smach.StateMachine.add('Happy', Happy(speakerStates, actionclient),
+                               transitions={'success': 'LookAtSpeaker',
                                             'preempted': 'preempted',
                                             'errored': 'errored'})
 

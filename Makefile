@@ -123,3 +123,43 @@ run:
 docs:
 	sphinx-build -aE docs build/docs > /dev/null
 
+
+run_robot:
+	( \
+	. /opt/ros/$(ROS_DISTRO)/setup.sh ; \
+	. $(BUILD_DIR)/build/catkin_pip_env/bin/activate ; \
+	. $(BUILD_DIR)/devel/setup.sh ; \
+	. $(shell pwd)/setuppath.sh ; \
+	python mediator_bot/action_response/simple_action_server/response_server.py ; \
+	)
+
+run_ai:
+	( \
+	. /opt/ros/$(ROS_DISTRO)/setup.sh ; \
+	. $(BUILD_DIR)/build/catkin_pip_env/bin/activate ; \
+	. $(BUILD_DIR)/devel/setup.sh ; \
+	python mediator_bot/smach_test/scripts/mediator_state_machine.py ; \
+	)
+
+run_timer:
+	( \
+	. /opt/ros/$(ROS_DISTRO)/setup.sh ; \
+	. $(BUILD_DIR)/build/catkin_pip_env/bin/activate ; \
+	. $(BUILD_DIR)/devel/setup.sh ; \
+	python mediator_bot/hark_preprocessing/src/timenode.py ; \
+	)
+
+run_processor:
+	( \
+	. /opt/ros/$(ROS_DISTRO)/setup.sh ; \
+	. $(BUILD_DIR)/build/catkin_pip_env/bin/activate ; \
+	. $(BUILD_DIR)/devel/setup.sh ; \
+	python mediator_bot/speech_speaker_recognition/src/recognition.py ; \
+	)
+
+run_hark:
+	( \
+	. /opt/ros/$(ROS_DISTRO)/setup.sh ; \
+	. $(BUILD_DIR)/devel/setup.sh ; \
+	mediator_bot/hark_preprocessing/run.sh ; \
+	)

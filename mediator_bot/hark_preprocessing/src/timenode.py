@@ -8,9 +8,9 @@ from speech_speaker_recognition.msg import AddedUser, Speaker, StartRecognitionM
 from mediator_bot_msgs.msg import MedBotSpeechTiming, MedBotSpeechStatus
 from mediator_bot_msgs.srv import MedBotSpeechQuery
 
-INC_FACTOR_POS = 2
-INC_FACTOR_NEG = 5
-DEC_FACTOR_POS = 0.5
+INC_FACTOR_POS = 1.5
+INC_FACTOR_NEG = 2
+DEC_FACTOR_POS = 0.2
 DEC_FACTOR_NEG = 0.1
 MAX_POS = 10
 MIN_NEG = -10
@@ -91,7 +91,7 @@ class SpeakerContainer(object):
         msg.name = self.label
         msg.status = self.status.value
         msg.speaking = self.speaking
-	msg.azimuth = self.azimuth
+        msg.azimuth = self.azimuth
         self.pub.publish(msg)
 
 
@@ -170,8 +170,7 @@ class TimeAllocator:
         @params:
             barLength   - Optional  : character length of bar (Int)
         """
-        if not self.start:
-            return
+
 
         if not self.init:
             sys.stdout.write(''.join([CURSOR_UP_ONE] * len(self.speakers)))
@@ -196,6 +195,10 @@ class TimeAllocator:
         Main function for calculating the current time allocation for each
         speaker. The result is printed on the terminal.
         """
+
+        if not self.start:
+            return
+
         # Increment/decrement the time allocation based on if they are speaking
         for speaker in self.speakers.itervalues():
             if speaker.speaking:
