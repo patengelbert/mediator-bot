@@ -380,7 +380,7 @@ var transcript_listener=new ROSLIB.Topic({
 var person_added_listener=new ROSLIB.Topic({
   ros:ros,
   name:'/added_user',
-  messageType:'ui/AddedUser'
+  messageType:'speech_speaker_recognition/AddedUser'
   });
 person_added_listener.subscribe(function(message){
   console.log(message.name);
