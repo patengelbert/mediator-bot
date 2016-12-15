@@ -127,6 +127,13 @@ class SpeakerStates:
             return None
         return random.choice(l)
 
+    def getZeroInactiveSpeakers(self):
+        return [s for s in self.speakers.itervalues() if not s.speaking and s.weight < -1.0]
+
+    def getZeroActiveSpeakers(self):
+        return [s for s in self.speakers.itervalues() if s.speaking and s.weight > 0.5]
+
+
 
 class ActionClientException(Exception):
     def __init__(self, what):
@@ -276,12 +283,15 @@ class LookAtSpeaker(State):
     outcomes = ['looked', 'finished', 'quieten', 'question', 'group_question', 'group_quieten']
     output_data = ['name']
 
+    firstTime = True
+
     def _execute(self, userdata):
         s = None
 
         action = self.checkNoImportantActions(userdata)
 
         if action is not None:
+            self.firstTime = False
             self.client.startActionTimeout(ACTION_TIMEOUT)
             return action
 
@@ -308,13 +318,12 @@ class LookAtSpeaker(State):
 
         if not self.client.allowSpecialActions:
             return None
-
         tooLongs = self.speakerStates.getTooLongActiveSpeakers()
         tooShorts = self.speakerStates.getTooShortInactiveSpeakers()
-        if len(tooShorts) == len(self.speakerStates.speakers):
+        if len(self.speakerStates.getZeroInactiveSpeakers()) == len(self.speakerStates.speakers):
             userData.name = ""
             return 'group_question'
-        elif len(tooLongs) >= 2:
+        elif len(self.speakerStates.getZeroActiveSpeakers()) >= 2:
             userData.name = ""
             return 'group_quieten'
         elif len(tooLongs) > 0:
