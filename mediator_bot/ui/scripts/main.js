@@ -303,7 +303,7 @@ $('#submit_name').click(function(){
     });
     endEnrollment.callService(requestStop,function(result){
      if(result.success){
-        console.log("end enrollment, name successfully added");
+        console.log("end enrollment, name successfully added" + inputs);
         $('#submit_name').text("Start Person Registration");
         ui.people.push({person:inputs,percent: 0,x:0,y:0});
         $('#new_people').append(inputs+ "<br>");
@@ -395,7 +395,10 @@ person_added_listener.subscribe(function(message){
     if(ui.people[i].person==message.name){found=1;console.log(message.name + "person already exists");}
   }
   //get message about added user
-  if(found==0){ui.people.push({person:message.name,percent: 0,x:0,y:0});}
+  if(found==0){
+    ui.people.push({person:message.name,percent: 0,x:0,y:0});
+    console.log("user added as not preexisitng" + message.name);
+  }
   set_test_mode(TEST_MODE); 
 });
   
