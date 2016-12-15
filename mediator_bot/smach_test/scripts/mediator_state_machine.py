@@ -352,6 +352,7 @@ class SelectOtherAfterQuieten(State):
     def _execute(self, userdata):
         chosenSpeaker = self.speakerStates.getLowestWeightedSpeaker()
         if chosenSpeaker is not None and chosenSpeaker.label != userdata.name:
+            rospy.sleep(0.8)
             # Don't shut someone up and then select them again
             self.req(keywords=["start"], name=chosenSpeaker.label, direction=chosenSpeaker.azimuth)
             chosenSpeaker.startTimeout(SINGLE_TIMEOUT)
