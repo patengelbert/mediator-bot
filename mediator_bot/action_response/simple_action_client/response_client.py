@@ -13,24 +13,24 @@ if __name__ == '__main__':
     rospy.init_node('response_client')
     client = actionlib.SimpleActionClient('response', responseAction)
     client.wait_for_server()
+    #
+    # goal = responseGoal(keywords=["intro"], name="Meng", direction=45)
+    # client.send_goal(goal)
+    # client.wait_for_result(rospy.Duration.from_sec(5.0))
+    #
+    # goal = responseGoal(keywords=["look"], name="Meng", direction=45)
+    # client.send_goal(goal)
+    # client.wait_for_result(rospy.Duration.from_sec(5.0))
+    #
+    # goal = responseGoal(keywords=["look"], name="Mark", direction=20)
+    # client.send_goal(goal)
+    # client.wait_for_result(rospy.Duration.from_sec(5.0))
+    #
+    # goal = responseGoal(keywords=["look"], name="Mark", direction=-40)
+    # client.send_goal(goal)
+    # client.wait_for_result(rospy.Duration.from_sec(5.0))
 
-    goal = responseGoal(keywords=["intro"], name="Meng", direction=45)
-    client.send_goal(goal)
-    client.wait_for_result(rospy.Duration.from_sec(5.0))
-
-    goal = responseGoal(keywords=["look"], name="Meng", direction=45)
-    client.send_goal(goal)
-    client.wait_for_result(rospy.Duration.from_sec(5.0))
-
-    goal = responseGoal(keywords=["look"], name="Mark", direction=20)
-    client.send_goal(goal)
-    client.wait_for_result(rospy.Duration.from_sec(5.0))
-
-    goal = responseGoal(keywords=["look"], name="Mark", direction=-40)
-    client.send_goal(goal)
-    client.wait_for_result(rospy.Duration.from_sec(5.0))
-
-    goal = responseGoal(keywords=["stop", "polite"], name="Mark", direction=45)
+    goal = responseGoal(keywords=["stop", "polite"], name="Becks", direction=-90)
     client.send_goal(goal)
     client.wait_for_result(rospy.Duration.from_sec(5.0))
 

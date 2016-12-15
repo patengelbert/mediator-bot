@@ -311,7 +311,7 @@ class LookAtSpeaker(State):
 
         tooLongs = self.speakerStates.getTooLongActiveSpeakers()
         tooShorts = self.speakerStates.getTooShortInactiveSpeakers()
-        if len(tooShorts) >= 2:
+        if len(tooShorts) == len(self.speakerStates.speakers):
             userData.name = ""
             return 'group_question'
         elif len(tooLongs) >= 2:

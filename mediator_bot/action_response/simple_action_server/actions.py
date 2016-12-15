@@ -197,7 +197,7 @@ class StopQuietEmptyResponse(ResponseAction):
 
 
 class StopQuietResponse(ResponseAction):
-    keywords = {"stop", "loud"}
+    keywords = {"loud"}
 
     def _response(self, name):
         self.behaviourManagerProxy.runBehavior("reponses-c397b4/Speak_quiet")

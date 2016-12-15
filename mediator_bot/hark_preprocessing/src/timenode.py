@@ -8,14 +8,14 @@ from speech_speaker_recognition.msg import AddedUser, Speaker, StartRecognitionM
 from mediator_bot_msgs.msg import MedBotSpeechTiming, MedBotSpeechStatus
 from mediator_bot_msgs.srv import MedBotSpeechQuery
 
-INC_FACTOR_POS = 0.4
-INC_FACTOR_NEG = 0.5
-DEC_FACTOR_POS = 0.3
+INC_FACTOR_POS = 0.45
+INC_FACTOR_NEG = 0.8
+DEC_FACTOR_POS = 0.25
 DEC_FACTOR_NEG = 0.1
 MAX_POS = 10
 MIN_NEG = -10
-THRESHOLD_POS = 7
-THRESHOLD_NEG = -5
+THRESHOLD_POS = 5
+THRESHOLD_NEG = -4
 START_WEIGHT = 0
 RATE = 10
 
@@ -104,7 +104,7 @@ class SpeakerContainer(object):
     def _doneTimer(self, *args, **kwargs):
         self.timeout = None
         self.speaking = False
-        self.updateTime = rospy.Time(1.0)
+        self.updateTime = rospy.Time(0.6)
 
     def cancelTimeout(self):
         if self.timeout is not None:
