@@ -388,7 +388,11 @@ var person_added_listener=new ROSLIB.Topic({
 person_added_listener.subscribe(function(message){
   console.log(message.name);
   //ui.people.push
-  ui.people.push({person:message.name,percent: 0,x:0,y:0});
+  var found=0;
+  for(var i=0; i<ui.people.length; i++){
+    if(ui.people[i].person==message.name){found=1;}
+  }
+  if(found==0){ui.people.push({person:message.name,percent: 0,x:0,y:0});}
   set_test_mode(TEST_MODE); 
 });
   
