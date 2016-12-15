@@ -47,7 +47,7 @@ from actions import (
 
 # NAO IP address and port
 
-robotIP = "169.254.44.123"
+robotIP = "169.254.214.125"
 robotPort = 9559
 
 actionsToAdd = {
@@ -173,9 +173,8 @@ class ResponseServer:
             self.mp = ALProxy("ALMotion", robotIP, 9559)
             self.mp.wakeUp()
 
-        except Exception as e:
-            rospy.logerr("Could not create proxy")
-            rospy.logerr("Error was: {}".format(e))
+        except Exception:
+            rospy.logerr("Could not connect to robot")
             raise
 
         self.addActions()
@@ -218,5 +217,8 @@ class ResponseServer:
 
 
 if __name__ == '__main__':
-    server = ResponseServer(debugLevel=rospy.DEBUG)
-    server.run()
+    try:
+        server = ResponseServer(debugLevel=rospy.DEBUG)
+        server.run()
+    except Exception as e:
+        rospy.logerr("Error is action Server: {}".format(e))

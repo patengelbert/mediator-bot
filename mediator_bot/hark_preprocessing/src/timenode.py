@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-
+import collections
 import rospy
 import sys
 
 from enum import Enum
+import numpy as np
 from speech_speaker_recognition.msg import AddedUser, Speaker, StartRecognitionMsg
 from mediator_bot_msgs.msg import MedBotSpeechTiming, MedBotSpeechStatus
 from mediator_bot_msgs.srv import MedBotSpeechQuery
@@ -18,6 +19,9 @@ THRESHOLD_POS = 5
 THRESHOLD_NEG = -4
 START_WEIGHT = 0
 RATE = 10
+
+QUEUE_SIZE = 10
+
 
 CURSOR_UP_ONE = '\x1b[1A'
 ERASE_LINE = '\x1b[2K'
@@ -51,11 +55,11 @@ class SpeakerContainer(object):
         self.thresholdPos = thresholdPos
         self.thresholdNeg = thresholdNeg
 
-        self.azimuth = 0.0
-
         self.updateTime = rospy.Time(0.1)
 
         self.timeout = None
+
+        self.azimuthQueue = collections.deque(maxlen=QUEUE_SIZE)
 
     @property
     def msg(self):
@@ -111,6 +115,13 @@ class SpeakerContainer(object):
             self.timeout.shutdown()
         self._doneTimer()
 
+    @property
+    def azimuth(self):
+        if len(self.azimuthQueue) == 0:
+            return 0.0
+        else:
+            return float(np.median(self.azimuthQueue))
+
 
 class TimeAllocator:
     """
@@ -135,7 +146,7 @@ class TimeAllocator:
         # If we receive only one message for a stream which is non-speaking, count it as speaking instead
         speaker.speaking = data.active or (data.active == speaker.speaking and not data.active)
         speaker.startTimeout()
-        speaker.azimuth = data.azimuth
+        speaker.azimuthQueue.appendleft(data.azimuth)
 
     def getSpeechStatus(self, req):
         speaker = self.speakers.get(req.name)
