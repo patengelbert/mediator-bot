@@ -303,6 +303,7 @@ $('#submit_name').click(function(){
     });
     endEnrollment.callService(requestStop,function(result){
      if(result.success){
+        console.log("end enrollment, name successfully added");
         $('#submit_name').text("Start Person Registration");
         ui.people.push({person:inputs,percent: 0,x:0,y:0});
         $('#new_people').append(inputs+ "<br>");
@@ -387,12 +388,13 @@ var person_added_listener=new ROSLIB.Topic({
   messageType:'speech_speaker_recognition/AddedUser'
   });
 person_added_listener.subscribe(function(message){
-  console.log(message.name);
+  console.log("person loaded from added user" + message.name);
   //ui.people.push
   var found=0;
   for(var i=0; i<ui.people.length; i++){
-    if(ui.people[i].person==message.name){found=1;}
+    if(ui.people[i].person==message.name){found=1;console.log(message.name + "person already exists");}
   }
+  //get message about added user
   if(found==0){ui.people.push({person:message.name,percent: 0,x:0,y:0});}
   set_test_mode(TEST_MODE); 
 });
