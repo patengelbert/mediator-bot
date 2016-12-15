@@ -305,7 +305,7 @@ $('#submit_name').click(function(){
      if(result.success){
         console.log("end enrollment, name successfully added" + inputs);
         $('#submit_name').text("Start Person Registration");
-        ui.people.push({person:inputs,percent: 0,x:0,y:0});
+        //ui.people.push({person:inputs,percent: 0,x:0,y:0});
         $('#new_people').append(inputs+ "<br>");
         registration_mode=0;
         $("#sentence_to_speak").text("");
