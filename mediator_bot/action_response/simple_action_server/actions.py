@@ -52,7 +52,7 @@ class MovementAction(Action):
 
 
 class StopSomeoneElseResponse(ResponseAction):
-    keywords = {"stop", "select_other"}
+    keywords = {"stop", "angry"}
 
     def _response(self, name):
         self.behaviourManagerProxy.runBehavior("reponses-c397b4/Someone_else")
@@ -91,7 +91,7 @@ class ThankYouResponse(ResponseAction):
 
 
 class StartAnyoneMovement(MovementAction):
-    keywords = {"start", "anyone", "select_other", "polite"}
+    keywords = {"start_anyone"}
 
     def _movement(self, direction):
         direction = math.radians(direction)
@@ -100,7 +100,7 @@ class StartAnyoneMovement(MovementAction):
 
 
 class StartPointMovement(MovementAction):
-    keywords = {"start", "select_other", "directed"}
+    keywords = {"start", "directed"}
 
     def _movement(self, direction):
         direction = math.radians(direction)
@@ -123,16 +123,21 @@ class ShareThoughtsResponse1(ResponseAction):
     def _response(self, name):
         self.behaviourManagerProxy.runBehavior("reponses-c397b4/Share")
 
+class InterruptResponse(ResponseAction):
+    keywords = {"stop"}
+
+    def _reponse(self, name):
+        self.textToSpeechProxy.say("Sorry to interrupt {}".format(name))
 
 class ShareThoughtsResponse2(ResponseAction):
-    keywords = {"start", "anyone", "thoughts"}
+    keywords = {"start_anyone"}
 
     def _response(self, name):
         self.textToSpeechProxy.say("Does anyone have thoughts on this matter?")
 
 
 class PointPalmUpAction(MovementAction):
-    keywords = {"polite", "directed"}
+    keywords = {"start", "polite", "directed"}
 
     def _movement(self, direction):
         direction = math.radians(direction)
@@ -164,14 +169,14 @@ class StopDidISAskYouResponse(ResponseAction):
 
 
 class StopTooLoudMovement(MovementAction):
-    keywords = {"stop", "loud"}
+    keywords = {"stop_loud"}
 
     def _movement(self, direction):
         self.behaviourManagerProxy.runBehavior("actions-67d9a5/Loud")
 
 
 class StopQuietMovement(MovementAction):
-    keywords = {"stop", "loud"}
+    keywords = {"loud"}
 
     def _movement(self, direction):
         self.behaviourManagerProxy.runBehavior("actions-67d9a5/Quiet")
@@ -192,7 +197,7 @@ class StopQuietEmptyResponse(ResponseAction):
 
 
 class StopQuietResponse(ResponseAction):
-    keywords = {"stop", "loud"}
+    keywords = {"loud"}
 
     def _response(self, name):
         self.behaviourManagerProxy.runBehavior("reponses-c397b4/Speak_quiet")
@@ -206,27 +211,27 @@ class StopShhResponse(ResponseAction):
 
 
 class StopMultipleMovement(MovementAction):
-    keywords = {"stop", "anyone"}
+    keywords = {"stop_anyone"}
 
     def _movement(self, direction):
         self.behaviourManagerProxy.runBehavior("actions-67d9a5/Stop")
 
 
 class StopMultipleResponse(ResponseAction):
-    keywords = {"stop", "anyone"}
+    keywords = {"stop_anyone"}
 
     def _response(self, name):
         self.behaviourManagerProxy.runBehavior("reponses-c397b4/One_speaker")
 
 
 class StopMultipleResponse2(ResponseAction):
-    keywords = {"polite", "anyone", "stop"}
+    keywords = {"polite", "stop_anyone"}
 
     def _response(self, name):
         self.textToSpeechProxy.say("Please, one person at a time")
 
 class StopMultipleResponseNamed(ResponseAction):
-    keywords = {"stop", "anyone", "directed"}
+    keywords = {"stop", "directed"}
 
     def _response(self, name):
         self.textToSpeechProxy.say("{}, please let other people speak".format(name))
@@ -238,7 +243,6 @@ class LookAtSpeaker(MovementAction):
     def _movement(self, direction):
         direction = math.radians(direction)
         self.movementProxy.setAngles("HeadYaw", direction, 0.3)
-        time.sleep(1)
 
 class IntroOutroMovement(MovementAction):
     keywords = {"intro", "outro"}

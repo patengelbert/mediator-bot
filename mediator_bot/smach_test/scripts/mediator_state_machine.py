@@ -16,9 +16,9 @@ EXTRA_KEYWORD_THRESHOLD = 0.6
 SELECT_OTHER_THRESHOLD = 0.5
 SAY_THANK_YOU_THRESHOLD = 0.5
 
-SINGLE_TIMEOUT = 15.0
-GROUP_TIMEOUT = 25.0
-ACTION_TIMEOUT = 10.0
+SINGLE_TIMEOUT = 10.0
+GROUP_TIMEOUT = 60.0
+ACTION_TIMEOUT = 25.0
 
 class Status(Enum):
     NO_STATUS = 0
@@ -126,6 +126,13 @@ class SpeakerStates:
         if len(l) == 0:
             return None
         return random.choice(l)
+
+    def getZeroInactiveSpeakers(self):
+        return [s for s in self.speakers.itervalues() if not s.speaking and s.weight < -1.0]
+
+    def getZeroActiveSpeakers(self):
+        return [s for s in self.speakers.itervalues() if s.speaking and s.weight > 0.5]
+
 
 
 class ActionClientException(Exception):
@@ -276,12 +283,15 @@ class LookAtSpeaker(State):
     outcomes = ['looked', 'finished', 'quieten', 'question', 'group_question', 'group_quieten']
     output_data = ['name']
 
+    firstTime = True
+
     def _execute(self, userdata):
         s = None
 
         action = self.checkNoImportantActions(userdata)
 
         if action is not None:
+            self.firstTime = False
             self.client.startActionTimeout(ACTION_TIMEOUT)
             return action
 
@@ -308,13 +318,12 @@ class LookAtSpeaker(State):
 
         if not self.client.allowSpecialActions:
             return None
-
         tooLongs = self.speakerStates.getTooLongActiveSpeakers()
         tooShorts = self.speakerStates.getTooShortInactiveSpeakers()
-        if len(tooShorts) >= 2:
+        if len(self.speakerStates.getZeroInactiveSpeakers()) == len(self.speakerStates.speakers):
             userData.name = ""
             return 'group_question'
-        elif len(tooLongs) >= 2:
+        elif len(self.speakerStates.getZeroActiveSpeakers()) >= 2:
             userData.name = ""
             return 'group_quieten'
         elif len(tooLongs) > 0:
@@ -341,7 +350,7 @@ class Quieten(State):
         extraKey = [] if random.random() < EXTRA_KEYWORD_THRESHOLD else ["directed"]  # Maybe force directed
         self.req(keywords=["stop"] + extraKey, name=speaker.label, direction=speaker.azimuth)
         speaker.startTimeout(SINGLE_TIMEOUT)
-        return 'select_other' if random.random() > SELECT_OTHER_THRESHOLD and len(self.speakerStates.speakers) > 1 else 'success'
+        return 'select_other'
 
 
 class SelectOtherAfterQuieten(State):
@@ -352,6 +361,7 @@ class SelectOtherAfterQuieten(State):
     def _execute(self, userdata):
         chosenSpeaker = self.speakerStates.getLowestWeightedSpeaker()
         if chosenSpeaker is not None and chosenSpeaker.label != userdata.name:
+            rospy.sleep(0.8)
             # Don't shut someone up and then select them again
             self.req(keywords=["start"], name=chosenSpeaker.label, direction=chosenSpeaker.azimuth)
             chosenSpeaker.startTimeout(SINGLE_TIMEOUT)
@@ -396,7 +406,7 @@ class GroupQuestion(State):
     def _execute(self, userdata):
         if not self.client.allowGroup:
             return 'skipped'
-        self.req(keywords=["start", "anyone"], name="", direction=0.0)
+        self.req(keywords=["start_anyone"], name="", direction=0.0)
         self.client.startTimeout(GROUP_TIMEOUT)
         return 'success'
 
@@ -408,7 +418,7 @@ class GroupQuieten(State):
     def _execute(self, userdata):
         if not self.client.allowGroup:
             return 'skipped'
-        self.req(keywords=["stop", "anyone"], name="", direction=0.0)
+        self.req(keywords=["stop_anyone"], name="", direction=0.0)
         self.client.startTimeout(GROUP_TIMEOUT)
         return 'success'
 

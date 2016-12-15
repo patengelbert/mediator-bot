@@ -1,23 +1,27 @@
 #!/usr/bin/env python
-
+import collections
 import rospy
 import sys
 
 from enum import Enum
+import numpy as np
 from speech_speaker_recognition.msg import AddedUser, Speaker, StartRecognitionMsg
 from mediator_bot_msgs.msg import MedBotSpeechTiming, MedBotSpeechStatus
 from mediator_bot_msgs.srv import MedBotSpeechQuery
 
-INC_FACTOR_POS = 1.5
-INC_FACTOR_NEG = 2
-DEC_FACTOR_POS = 0.2
+INC_FACTOR_POS = 0.45
+INC_FACTOR_NEG = 0.8
+DEC_FACTOR_POS = 0.25
 DEC_FACTOR_NEG = 0.1
 MAX_POS = 10
 MIN_NEG = -10
 THRESHOLD_POS = 5
-THRESHOLD_NEG = -5
+THRESHOLD_NEG = -4
 START_WEIGHT = 0
 RATE = 10
+
+QUEUE_SIZE = 10
+
 
 CURSOR_UP_ONE = '\x1b[1A'
 ERASE_LINE = '\x1b[2K'
@@ -51,7 +55,11 @@ class SpeakerContainer(object):
         self.thresholdPos = thresholdPos
         self.thresholdNeg = thresholdNeg
 
-        self.azimuth = 0.0
+        self.updateTime = rospy.Time(0.1)
+
+        self.timeout = None
+
+        self.azimuthQueue = collections.deque(maxlen=QUEUE_SIZE)
 
     @property
     def msg(self):
@@ -94,6 +102,26 @@ class SpeakerContainer(object):
         msg.azimuth = self.azimuth
         self.pub.publish(msg)
 
+    def startTimeout(self):
+        self.timeout = rospy.Timer(rospy.Duration(self.updateTime.secs, self.updateTime.nsecs), self._doneTimer, True)
+
+    def _doneTimer(self, *args, **kwargs):
+        self.timeout = None
+        self.speaking = False
+        self.updateTime = rospy.Time(0.6)
+
+    def cancelTimeout(self):
+        if self.timeout is not None:
+            self.timeout.shutdown()
+        self._doneTimer()
+
+    @property
+    def azimuth(self):
+        if len(self.azimuthQueue) == 0:
+            return 0.0
+        else:
+            return float(np.median(self.azimuthQueue))
+
 
 class TimeAllocator:
     """
@@ -108,13 +136,17 @@ class TimeAllocator:
         """
         Callback function to show who is currently speaking
         """
+
         speaker = self.speakers.get(data.speaker)
         if speaker is None:
             rospy.logerr("Speaker {} has not yet been registered".format(data.speaker))
             return
-
-        speaker.speaking = data.active
-        speaker.azimuth = data.azimuth
+        speaker.cancelTimeout()
+        speaker.updateTime = data.since_last_update
+        # If we receive only one message for a stream which is non-speaking, count it as speaking instead
+        speaker.speaking = data.active or (data.active == speaker.speaking and not data.active)
+        speaker.startTimeout()
+        speaker.azimuthQueue.appendleft(data.azimuth)
 
     def getSpeechStatus(self, req):
         speaker = self.speakers.get(req.name)
@@ -171,7 +203,6 @@ class TimeAllocator:
             barLength   - Optional  : character length of bar (Int)
         """
 
-
         if not self.init:
             sys.stdout.write(''.join([CURSOR_UP_ONE] * len(self.speakers)))
         self.init = False
@@ -201,12 +232,13 @@ class TimeAllocator:
 
         # Increment/decrement the time allocation based on if they are speaking
         for speaker in self.speakers.itervalues():
+            t = speaker.updateTime.to_sec()
             if speaker.speaking:
                 factor = INC_FACTOR_POS if speaker.weight >= 0 else INC_FACTOR_NEG
-                speaker.weight += float(factor) / float(self.rate)
+                speaker.weight += float(factor) * t / float(self.rate)
             else:
                 factor = DEC_FACTOR_POS if speaker.weight >= 0 else DEC_FACTOR_NEG
-                speaker.weight -= float(factor) / float(self.rate)
+                speaker.weight -= float(factor) * t / float(self.rate)
             speaker.sendMessage()
         if self.debugLevel <= rospy.INFO:
             # Print out the current speech participation levels
@@ -220,7 +252,8 @@ class TimeAllocator:
         msg.header.stamp = rospy.Time().now()
         msg.num_speakers = len(self.speakers)
         msg.speaker_id = [s.label for s in self.speakers.itervalues()]
-        msg.weighting = [float(s.weight) for s in self.speakers.itervalues()]
+        percents = [100 * float(speaker.weight) / (float(speaker.maxVal) if speaker.weight >= 0 else (-1 * float(speaker.minVal))) for speaker in self.speakers.itervalues()]
+        msg.weighting = percents
         self.pubWeight.publish(msg)
 
     def run(self):
